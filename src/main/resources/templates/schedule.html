@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>インタビュースケジュール</title>
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="container">
+
+    <h1 class="page-title">
+        インタビュースケジュール
+    </h1>
+
+    <div class="section-card">
+
+        <div th:if="${scheduledEmployees.isEmpty()}">
+
+            <p>
+                予定されているインタビューはありません。
+            </p>
+
+        </div>
+
+        <div th:each="emp : ${scheduledEmployees}"
+             class="section-card"
+             style="margin-bottom:15px;">
+
+            <h3 th:text="${emp.name}">
+                社員名
+            </h3>
+
+            <p>
+
+                <strong>日付：</strong>
+
+                <span th:text="${emp.interviewDate}">
+                </span>
+
+            </p>
+
+            <p>
+
+                <strong>時間：</strong>
+
+                <span th:text="${emp.interviewTime}">
+                </span>
+
+            </p>
+
+            <p>
+
+                <strong>サイト：</strong>
+
+                <span th:text="${emp.siteLocation}">
+                </span>
+
+            </p>
+
+            <a th:href="@{'/employees/' + ${emp.id}}">
+                詳細を見る
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

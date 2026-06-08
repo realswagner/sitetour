@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Interview Cards</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="fragments/navbar :: navbar"></div>
+<h1>Interview Cards</h1>
+
+
+<div th:each="card : ${cards}"
+     class="card"
+     th:id="'card-' + ${card.id}">
+    <h3>
+        Interview Date:
+        <span th:text="${#temporals.format(
+            card.employee.interviewDate,
+            'yyyy/MM/dd'
+        )}">
+        </span>
+    </h3>
+
+    <h2 th:text="${card.employee.name}"></h2>
+
+    <form action="/interviewcards/update" method="post">
+
+        <input type="hidden"
+               th:name="${_csrf.parameterName}"
+               th:value="${_csrf.token}">
+
+        <input type="hidden"
+               name="id"
+               th:value="${card.id}">
+
+        <p>Question 1</p>
+        <input type="text"
+               name="question1"
+               th:value="${card.question1}">
+
+        <p>Answer 1</p>
+        <textarea name="answer1"
+                  th:text="${card.answer1}">
+        </textarea>
+
+        <p>Question 2</p>
+        <input type="text"
+               name="question2"
+               th:value="${card.question2}">
+
+        <p>Answer 2</p>
+        <textarea name="answer2"
+                  th:text="${card.answer2}">
+        </textarea>
+
+        <p>Question 3</p>
+        <input type="text"
+               name="question3"
+               th:value="${card.question3}">
+
+        <p>Answer 3</p>
+        <textarea name="answer3"
+                  th:text="${card.answer3}">
+        </textarea>
+
+        <p>Question 4</p>
+        <input type="text"
+               name="question4"
+               th:value="${card.question4}">
+
+        <p>Answer 4</p>
+        <textarea name="answer4"
+                  th:text="${card.answer4}">
+        </textarea>
+
+        <p>Question 5</p>
+        <input type="text"
+               name="question5"
+               th:value="${card.question5}">
+
+        <p>Answer 5</p>
+        <textarea name="answer5"
+                  th:text="${card.answer5}">
+        </textarea>
+
+        <p>Impressions</p>
+        <textarea name="impressions"
+                  th:text="${card.impressions}">
+        </textarea>
+
+        <br><br>
+
+        <button type="submit">
+            Save
+        </button>
+
+    </form>
+
+    <hr>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>サイトツアーダッシュボード</title>
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="container">
+
+    <h1 class="page-title">サイトツアーダッシュボード</h1>
+
+    <div class="user-info">
+        <div>
+            <strong>ログインユーザー：</strong>
+            <span th:text="${username}"></span>
+        </div>
+
+        <div style="margin-top:8px;">
+        <span th:if="${isAdmin}">
+            管理者モード
+        </span>
+
+            <span th:unless="${isAdmin}">
+            チームモード
+        </span>
+        </div>
+    </div>
+
+    <!-- Admin only filter -->
+
+    <div class="section-card" th:if="${isAdmin}">
+        <h3>チームフィルター</h3>
+
+        <form method="get" action="/dashboard">
+
+            <select name="teamId">
+
+                <option value="">
+                    全チーム
+                </option>
+
+                <option
+                        th:each="team : ${teams}"
+                        th:value="${team.id}"
+                        th:text="${team.name}"
+                        th:selected="${team.id == selectedTeam}">
+                </option>
+
+            </select>
+
+            <button type="submit" class="logout-btn">
+                表示
+            </button>
+
+        </form>
+    </div>
+
+    <!-- Today's interviews -->
+
+    <div class="section-card">
+
+        <h2>本日のインタビュー予定</h2>
+
+        <div th:if="${#lists.isEmpty(todaysInterviews)}">
+            本日の予定はありません。
+        </div>
+
+        <div th:unless="${#lists.isEmpty(todaysInterviews)}">
+
+            <div th:each="employee : ${todaysInterviews}"
+                 style="padding:10px 0;border-bottom:1px solid #eee;">
+
+                <strong th:text="${employee.name}"></strong>
+
+                <span>
+                （
+                <span th:text="${employee.interviewTime}"></span>
+                ）
+            </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Status cards -->
+
+    <div class="stats-container">
+
+        <a class="stat-link"
+           href="/employees?status=NOT_CONTACTED">
+
+            <div class="stat-card">
+
+                <div class="stat-title">
+                    未連絡
+                </div>
+
+                <div class="stat-number"
+                     th:text="${stats.notContacted}">
+                </div>
+
+            </div>
+
+        </a>
+
+        <a class="stat-link"
+           href="/employees?status=CONTACTING">
+
+            <div class="stat-card">
+
+                <div class="stat-title">
+                    連絡中
+                </div>
+
+                <div class="stat-number"
+                     th:text="${stats.contacting}">
+                </div>
+
+            </div>
+
+        </a>
+
+        <a class="stat-link"
+           href="/employees?status=AWAITING_REPLY">
+
+            <div class="stat-card">
+
+                <div class="stat-title">
+                    返信待ち
+                </div>
+
+                <div class="stat-number"
+                     th:text="${stats.awaitingReply}">
+                </div>
+
+            </div>
+
+        </a>
+
+        <a class="stat-link"
+           href="/employees?status=SCHEDULED">
+
+            <div class="stat-card">
+
+                <div class="stat-title">
+                    日程確定
+                </div>
+
+                <div class="stat-number"
+                     th:text="${stats.scheduled}">
+                </div>
+
+            </div>
+
+        </a>
+
+        <a class="stat-link"
+           href="/employees?status=COMPLETED">
+
+            <div class="stat-card">
+
+                <div class="stat-title">
+                    完了
+                </div>
+
+                <div class="stat-number"
+                     th:text="${stats.completed}">
+                </div>
+
+            </div>
+
+        </a>
+
+    </div>
+
+    <br>
+
+    <form action="/logout" method="post">
+
+        <input
+                type="hidden"
+                th:name="${_csrf.parameterName}"
+                th:value="${_csrf.token}" />
+
+        <button type="submit" class="logout-btn">
+            ログアウト
+        </button>
+
+    </form>
+
+</div>
+
+</body>
+</html>

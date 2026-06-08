@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<!-- update employee page -->
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Employee Detail</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+<div class="container">
+
+    <h1 class="page-title">社員詳細</h1>
+
+    <div class="section-card">
+
+        <h2 th:text="${employee.name}"></h2>
+
+        <p><strong>メール：</strong>
+            <span th:text="${employee.email}"></span>
+        </p>
+
+        <p><strong>電話番号：</strong>
+            <span th:text="${employee.phoneNumber}"></span>
+        </p>
+
+        <p><strong>サイト：</strong>
+            <span th:text="${employee.siteLocation}"></span>
+        </p>
+
+        <p>
+            <strong>ステータス：</strong>
+
+            <span th:switch="${employee.status}">
+
+                <span th:case="'NOT_CONTACTED'">未連絡</span>
+                <span th:case="'CONTACTING'">連絡中</span>
+                <span th:case="'AWAITING_REPLY'">返信待ち</span>
+                <span th:case="'SCHEDULED'">予定確定</span>
+                <span th:case="'COMPLETED'">完了</span>
+
+            </span>
+
+        </p>
+
+    </div>
+
+    <div class="section-card">
+
+        <h2>インタビュー情報</h2>
+
+        <p>
+            <strong>候補日：</strong>
+            <span th:text="${employee.proposedDates}"></span>
+        </p>
+
+        <p>
+            <strong>インタビュー日：</strong>
+            <span th:text="${employee.interviewDate}"></span>
+        </p>
+
+        <p>
+            <strong>インタビュー時間：</strong>
+            <span th:text="${employee.interviewTime}"></span>
+        </p>
+
+        <p>
+            <strong>Zoomリンク：</strong>
+            <span th:text="${employee.zoomLink}"></span>
+        </p>
+
+    </div>
+
+    <div class="section-card" th:unless="${isAdmin}">
+
+        <h2>進捗更新</h2>
+
+        <form action="/employees/update-status" method="post">
+
+            <input type="hidden"
+                   th:name="${_csrf.parameterName}"
+                   th:value="${_csrf.token}">
+
+            <input type="hidden"
+                   name="id"
+                   th:value="${employee.id}">
+
+            <div class="form-group">
+
+                <select name="status">
+
+                    <option value="NOT_CONTACTED">未連絡</option>
+                    <option value="CONTACTING">連絡中</option>
+                    <option value="AWAITING_REPLY">返信待ち</option>
+                    <option value="SCHEDULED">予定確定</option>
+                    <option value="COMPLETED">完了</option>
+
+                </select>
+
+            </div>
+
+            <button type="submit"
+                    class="logout-btn">
+                更新
+            </button>
+
+        </form>
+
+    </div>
+
+    <div class="section-card">
+
+        <h2>パーソナルレポート</h2>
+
+        <div th:if="${card != null}">
+
+            <div class="report-block">
+
+                <div class="report-question">
+                    質問①
+                </div>
+
+                <div class="report-answer"
+                     th:text="${card.question1}">
+                </div>
+
+            </div>
+
+            <div class="report-block">
+
+                <div class="report-question">
+                    回答①
+                </div>
+
+                <div class="report-answer"
+                     th:text="${card.answer1}">
+                </div>
+
+            </div>
+
+            <div class="report-block">
+
+                <div class="report-question">
+                    質問②
+                </div>
+
+                <div class="report-answer"
+                     th:text="${card.question2}">
+                </div>
+
+            </div>
+
+            <div class="report-block">
+
+                <div class="report-question">
+                    回答②
+                </div>
+
+                <div class="report-answer"
+                     th:text="${card.answer2}">
+                </div>
+
+            </div>
+
+            <div class="report-block">
+
+                <div class="report-question">
+                    所感
+                </div>
+
+                <div class="report-answer"
+                     th:text="${card.impressions}">
+                </div>
+
+            </div>
+
+        </div>
+
+        <div th:if="${card == null}">
+            パーソナルレポート未作成
+        </div>
+
+    </div>
+
+    <div style="display:flex; gap:15px;">
+
+        <div class="action-buttons">
+
+            <a href="/employees" class="action-btn-secondary">
+                ← 一覧へ戻る
+            </a>
+
+            <a th:unless="${isAdmin}"
+               th:href="@{'/employees/' + ${employee.id} + '/edit'}"
+               class="action-btn">
+                編集
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+</body>
+</html>

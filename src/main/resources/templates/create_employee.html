@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Employee</title>
+</head>
+<body>
+<div th:replace="fragments/navbar :: navbar"></div>
+<h1>Create Employee</h1>
+
+<form action="/employees" method="post">
+
+    <input type="hidden"
+           th:name="${_csrf.parameterName}"
+           th:value="${_csrf.token}">
+
+    <label>Name:</label>
+    <input type="text" name="name" required>
+    <br><br>
+
+    <label>Email:</label>
+    <input type="text" name="email">
+    <br><br>
+
+    <label>Phone:</label>
+    <input type="text" name="phoneNumber">
+    <br><br>
+
+    <label>Location:</label>
+    <input type="text" name="siteLocation">
+    <br><br>
+
+    <label>Status:</label>
+    <select name="status">
+        <option value="NOT_CONTACTED">Not Contacted</option>
+        <option value="CONTACTING">Contacting</option>
+        <option value="AWAITING_REPLY">Awaiting Reply</option>
+        <option value="SCHEDULED">Scheduled</option>
+        <option value="COMPLETED">Completed</option>
+    </select>
+
+    <br><br>
+
+    <label>Proposed Dates/Notes:</label>
+    <br>
+    <textarea name="proposedDates"
+              rows="4"
+              cols="50"></textarea>
+
+    <br><br>
+
+    <label>Interview Date:</label>
+    <input type="date" name="interviewDate">
+
+    <br><br>
+
+    <label>Interview Time:</label>
+
+    <select name="interviewTime">
+        <option value="09:00">09:00</option>
+        <option value="09:30">09:30</option>
+        <option value="10:00">10:00</option>
+        <option value="10:30">10:30</option>
+        <option value="11:00">11:00</option>
+        <option value="11:30">11:30</option>
+        <option value="12:00">12:00</option>
+        <option value="12:30">12:30</option>
+        <option value="13:00">13:00</option>
+        <option value="13:30">13:30</option>
+        <option value="14:00">14:00</option>
+        <option value="14:30">14:30</option>
+        <option value="15:00">15:00</option>
+        <option value="15:30">15:30</option>
+        <option value="16:00">16:00</option>
+        <option value="16:30">16:30</option>
+        <option value="17:00">17:00</option>
+        <option value="17:30">17:30</option>
+        <option value="18:00">18:00</option>
+        <option value="18:30">18:30</option>
+        <option value="19:00">19:00</option>
+    </select>
+
+    <br><br>
+
+    <label>Zoom Link:</label>
+    <input type="text"
+           name="zoomLink"
+           size="60">
+
+    <br><br>
+
+    <button type="submit">Save</button>
+
+</form>
+
+</body>
+</html>

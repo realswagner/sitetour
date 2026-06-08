@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Team Details</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="fragments/navbar :: navbar"></div>
+<h1 th:text="${team.name}"></h1>
+
+<h2>Members</h2>
+
+<table border="1">
+
+    <tr>
+        <th>Name</th>
+        <th>Status</th>
+    </tr>
+
+    <tr th:each="employee : ${employees}">
+
+        <td th:text="${employee.name}"></td>
+
+        <td th:text="${employee.status}"></td>
+
+    </tr>
+
+</table>
+
+<br>
+
+<a href="/teams">
+    Back to Teams
+</a>
+
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<div th:fragment="navbar">
+
+    <nav class="navbar">
+
+        <div class="navbar-brand">
+            サイトツアー
+        </div>
+
+        <div class="navbar-links" th:if="${isAdmin}">
+
+            <a href="/dashboard">
+                ダッシュボード
+            </a>
+
+            <a href="/admin">
+                管理者パネル
+            </a>
+
+        </div>
+
+        <div class="navbar-links" th:unless="${isAdmin}">
+
+            <a href="/dashboard">
+                ダッシュボード
+            </a>
+
+            <a href="/employees">
+                社員一覧
+            </a>
+
+            <a href="/schedule">
+                スケジュール
+            </a>
+
+            <a href="/interviewcards">
+                パーソナルレポート
+            </a>
+
+        </div>
+
+    </nav>
+
+</div>
+
+</body>
+</html>
