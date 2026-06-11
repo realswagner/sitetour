@@ -1,35 +1,62 @@
 package com.sitetour.sitetourapplication.controller;
 
 import com.sitetour.sitetourapplication.entity.InterviewCard;
+import com.sitetour.sitetourapplication.entity.User;
+import com.sitetour.sitetourapplication.repository.UserRepository;
 import com.sitetour.sitetourapplication.service.InterviewCardService;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Controller
 public class InterviewCardController {
 
     private final InterviewCardService interviewCardService;
+    private final UserRepository userRepository;
 
     public InterviewCardController(
-            InterviewCardService interviewCardService) {
-
+            InterviewCardService interviewCardService,
+            UserRepository userRepository
+    ) {
         this.interviewCardService = interviewCardService;
+        this.userRepository = userRepository;
     }
 
-    @GetMapping("/interviewcards")
-    public String interviewCards(Model model) {
 
-        model.addAttribute(
-                "cards",
-                interviewCardService.getAllCards());
-        model.addAttribute(
-                "cards",
-                interviewCardService.getAllCardsOrdered());
+    // view list (secured)
+
+    @GetMapping("/interviewcards")
+    public String interviewCards(Model model,
+                                 Authentication authentication) {
+
+        User user = userRepository
+                .findByUsername(authentication.getName())
+                .orElseThrow();
+
+        boolean isAdmin =
+                user.getRole().name().equals("ADMIN");
+
+        List<InterviewCard> cards;
+
+        if (isAdmin) {
+            cards = interviewCardService.getAllCardsOrdered();
+        } else {
+            cards = interviewCardService.getCardsByTeam(
+                    user.getTeam().getId()
+            );
+        }
+
+        model.addAttribute("cards", cards);
+        model.addAttribute("isAdmin", isAdmin);
 
         return "interviewcards";
     }
 
+
+    // update card (secured)
     @PostMapping("/interviewcards/update")
     public String updateCard(
 
@@ -50,11 +77,33 @@ public class InterviewCardController {
             @RequestParam(required = false) String question5,
             @RequestParam(required = false) String answer5,
 
-            @RequestParam(required = false) String impressions
+            @RequestParam(required = false) String impressions,
+
+            Authentication authentication
     ) {
+
+        User user = userRepository
+                .findByUsername(authentication.getName())
+                .orElseThrow();
+
+        boolean isAdmin =
+                user.getRole().name().equals("ADMIN");
 
         InterviewCard card =
                 interviewCardService.getCardById(id);
+
+        // security check
+
+        if (!isAdmin &&
+                !card.getEmployee()
+                        .getTeam()
+                        .getId()
+                        .equals(user.getTeam().getId())) {
+
+            return "redirect:/interviewcards";
+        }
+
+        //update fields
 
         card.setQuestion1(question1);
         card.setAnswer1(answer1);

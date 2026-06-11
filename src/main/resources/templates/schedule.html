@@ -17,10 +17,26 @@
     <h1 class="page-title">
         インタビュースケジュール
     </h1>
+    <div th:unless="${groupedSchedules.isEmpty()}"
+         class="section-card">
+
+        <strong>日付へ移動：</strong>
+
+        <span th:each="entry : ${groupedSchedules}"
+              style="margin-right:15px;">
+
+        <a th:href="'#date-' + ${entry.key}"
+           class="employee-link"
+           th:text="${#temporals.format(entry.key,'MM/dd')}">
+        </a>
+
+    </span>
+
+    </div>
 
     <div class="section-card">
 
-        <div th:if="${scheduledEmployees.isEmpty()}">
+        <div th:if="${groupedSchedules.isEmpty()}">
 
             <p>
                 予定されているインタビューはありません。
@@ -28,44 +44,58 @@
 
         </div>
 
-        <div th:each="emp : ${scheduledEmployees}"
+        <div th:each="entry : ${groupedSchedules}"
              class="section-card"
-             style="margin-bottom:15px;">
+             th:id="'date-' + ${entry.key}">
 
-            <h3 th:text="${emp.name}">
-                社員名
-            </h3>
+            <h2 th:text="${entry.key}">
+                Date
+            </h2>
 
-            <p>
+            <div th:each="emp : ${entry.value}"
+                 style="margin-top:15px;">
 
-                <strong>日付：</strong>
+                <h3 th:text="${emp.name}"></h3>
 
-                <span th:text="${emp.interviewDate}">
-                </span>
+                <p>
+                    <strong>時間：</strong>
+                    <span th:text="${emp.interviewTime}">
+            </span>
+                </p>
 
-            </p>
+                <p>
+                    <strong>サイト：</strong>
+                    <span th:text="${emp.siteLocation}">
+            </span>
+                </p>
+                <p>
 
-            <p>
+                    <strong>状況：</strong>
 
-                <strong>時間：</strong>
+                    <span th:if="${emp.status.name() == 'SCHEDULED'}"
+                          class="status-scheduled">
 
-                <span th:text="${emp.interviewTime}">
-                </span>
+        予定確定
 
-            </p>
+    </span>
 
-            <p>
+                    <span th:if="${emp.status.name() == 'COMPLETED'}"
+                          class="status-completed">
 
-                <strong>サイト：</strong>
+        完了
 
-                <span th:text="${emp.siteLocation}">
-                </span>
+    </span>
 
-            </p>
+                </p>
 
-            <a th:href="@{'/employees/' + ${emp.id}}">
-                詳細を見る
-            </a>
+                <a th:href="@{'/employees/' + ${emp.id}}"
+                   class="action-btn-secondary">
+                    詳細を見る
+                </a>
+
+                <div style="height:15px;"></div>
+
+            </div>
 
         </div>
 

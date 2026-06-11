@@ -55,4 +55,9 @@ public class InterviewCardService {
                 )
                 .toList();
     }
+    //return card by team ID
+    public List<InterviewCard> getCardsByTeam(Long teamId) {
+        return interviewCardRepository
+                .findByEmployee_Team_IdOrderByEmployee_InterviewDateAsc(teamId);
+    }
 }

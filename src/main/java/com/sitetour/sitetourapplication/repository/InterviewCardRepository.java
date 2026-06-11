@@ -11,6 +11,7 @@ public interface InterviewCardRepository
 
     Optional<InterviewCard> findByEmployeeId(Long employeeId);
     List<InterviewCard> findAllByOrderByEmployee_InterviewDateAsc();
+    List<InterviewCard> findByEmployee_Team_IdOrderByEmployee_InterviewDateAsc(Long teamId);
     void deleteAllByEmployeeTeamId(Long teamId);
 
 }

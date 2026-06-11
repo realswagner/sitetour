@@ -90,9 +90,26 @@ public class EmployeeController {
 
     //view individual employee page routing
     @GetMapping("/employees/{id}")
-    public String viewEmployee(@PathVariable Long id, Model model) {
+    public String viewEmployee(
+            @PathVariable Long id,
+            Authentication authentication,
+            Model model) {
 
         Employee employee = employeeService.getEmployeeById(id);
+
+        User user = userRepository
+                .findByUsername(authentication.getName())
+                .orElseThrow();
+
+        boolean isAdmin =
+                user.getRole().name().equals("ADMIN");
+
+        if (!isAdmin &&
+                !employee.getTeam().getId()
+                        .equals(user.getTeam().getId())) {
+
+            return "redirect:/employees";
+        }
 
         model.addAttribute("employee", employee);
 
@@ -105,8 +122,27 @@ public class EmployeeController {
     }
     //update status endpoint (enum)
     @PostMapping("/employees/update-status")
-    public String updateStatus(@RequestParam Long id,
-                               @RequestParam InterviewStatus status) {
+    public String updateStatus(
+            @RequestParam Long id,
+            @RequestParam InterviewStatus status,
+            Authentication authentication) {
+
+        Employee employee =
+                employeeService.getEmployeeById(id);
+
+        User user = userRepository
+                .findByUsername(authentication.getName())
+                .orElseThrow();
+
+        boolean isAdmin =
+                user.getRole().name().equals("ADMIN");
+
+        if (!isAdmin &&
+                !employee.getTeam().getId()
+                        .equals(user.getTeam().getId())) {
+
+            return "redirect:/employees";
+        }
 
         employeeService.updateStatus(id, status);
 
@@ -116,10 +152,25 @@ public class EmployeeController {
     @GetMapping("/employees/{id}/edit")
     public String showEditForm(
             @PathVariable Long id,
+            Authentication authentication,
             Model model) {
 
         Employee employee =
                 employeeService.getEmployeeById(id);
+
+        User user = userRepository
+                .findByUsername(authentication.getName())
+                .orElseThrow();
+
+        boolean isAdmin =
+                user.getRole().name().equals("ADMIN");
+
+        if (!isAdmin &&
+                !employee.getTeam().getId()
+                        .equals(user.getTeam().getId())) {
+
+            return "redirect:/employees";
+        }
 
         model.addAttribute("employee", employee);
 
@@ -137,8 +188,25 @@ public class EmployeeController {
             @RequestParam(required = false) String proposedDates,
             @RequestParam(required = false) LocalDate interviewDate,
             @RequestParam(required = false) LocalTime interviewTime,
-            @RequestParam(required = false) String zoomLink
+            @RequestParam(required = false) String zoomLink,
+            Authentication authentication
     ) {
+        Employee employee =
+                employeeService.getEmployeeById(id);
+
+        User user = userRepository
+                .findByUsername(authentication.getName())
+                .orElseThrow();
+
+        boolean isAdmin =
+                user.getRole().name().equals("ADMIN");
+
+        if (!isAdmin &&
+                !employee.getTeam().getId()
+                        .equals(user.getTeam().getId())) {
+
+            return "redirect:/employees";
+        }
 
         employeeService.updateEmployee(
                 id,

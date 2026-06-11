@@ -105,8 +105,8 @@ public class EmployeeService {
 
     //filter by interview status
     public List<Employee> getEmployeesByStatus(InterviewStatus status) {
-        return employeeRepository.findByStatus(status);
-
+        return employeeRepository
+                .findByStatusOrderByInterviewDateAscInterviewTimeAsc(status);
     }
 
     //edit page function to update employee information
@@ -193,4 +193,30 @@ public class EmployeeService {
                                 && employee.getInterviewDate().equals(LocalDate.now()))
                 .toList();
     }
+
+    //sorts employees on /schedule page (deprecated/admin view use)
+    public List<Employee> getScheduledEmployees() {
+
+        return employeeRepository
+                .findByStatusInOrderByInterviewDateAscInterviewTimeAsc(
+                        List.of(
+                                InterviewStatus.SCHEDULED,
+                                InterviewStatus.COMPLETED
+                        )
+                );
+    }
+    //new schedule get method filtered by team
+    public List<Employee> getScheduledEmployeesByTeam(Long teamId) {
+
+        return employeeRepository
+                .findByTeamIdAndStatusInOrderByInterviewDateAscInterviewTimeAsc(
+                        teamId,
+                        List.of(
+                                InterviewStatus.SCHEDULED,
+                                InterviewStatus.COMPLETED
+                        )
+                );
+    }
+
+
 }

@@ -163,6 +163,16 @@ label {
 .form-group {
     margin-bottom: 18px;
 }
+.form-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
 
 .action-buttons {
     display: flex;
@@ -229,4 +239,68 @@ label {
 .employee-table td {
     padding: 12px;
     border: 1px solid var(--border);
+}
+
+.interview-card {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    margin: 0 auto 25px auto;
+    max-width: 1000px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.interview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+
+    border-bottom: 1px solid var(--border);
+}
+
+.interview-name {
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.question-block {
+    margin-bottom: 20px;
+}
+
+.question-title {
+    color: var(--primary);
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.answer-area {
+    min-height: 100px;
+}
+
+.save-row {
+    text-align: right;
+    margin-top: 25px;
+}
+
+.employee-link {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.employee-link:hover {
+    text-decoration: underline;
+}
+
+.status-scheduled {
+    font-weight: bold;
+    color: #f57c00;
+}
+
+.status-completed {
+    font-weight: bold;
+    color: #4caf50;
 }

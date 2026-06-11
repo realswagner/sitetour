@@ -13,6 +13,25 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
     List<Employee> findByStatus(InterviewStatus status);
     List<Employee> findByTeamId(Long teamId);
+    List<Employee> findByStatusOrderByInterviewDateAscInterviewTimeAsc(
+            InterviewStatus status
+    );
+    List<Employee>
+    findByTeamIdAndStatusOrderByInterviewDateAscInterviewTimeAsc(
+            Long teamId,
+            InterviewStatus status
+    );
+    // '/schedule' ordering method
+    List<Employee>
+    findByStatusInOrderByInterviewDateAscInterviewTimeAsc(
+            List<InterviewStatus> statuses
+    );
+
+    List<Employee>
+    findByTeamIdAndStatusInOrderByInterviewDateAscInterviewTimeAsc(
+            Long teamId,
+            List<InterviewStatus> statuses
+    );
     long countByStatus(InterviewStatus status);
     long countByStatusAndTeamId(InterviewStatus status, Long teamId);
     @Modifying

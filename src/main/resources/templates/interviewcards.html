@@ -6,22 +6,33 @@
 </head>
 <body>
 <div th:replace="fragments/navbar :: navbar"></div>
-<h1>Interview Cards</h1>
+<h1 class="page-title">
+    パーソナルレポート
+</h1>
 
 
 <div th:each="card : ${cards}"
-     class="card"
+     class="interview-card"
      th:id="'card-' + ${card.id}">
-    <h3>
-        Interview Date:
-        <span th:text="${#temporals.format(
+    <div class="interview-header">
+
+        <div class="interview-name"
+             th:text="${card.employee.name}">
+        </div>
+
+        <div>
+
+            <strong>インタビュー日:</strong>
+
+            <span th:text="${#temporals.format(
             card.employee.interviewDate,
             'yyyy/MM/dd'
         )}">
         </span>
-    </h3>
 
-    <h2 th:text="${card.employee.name}"></h2>
+        </div>
+
+    </div>
 
     <form action="/interviewcards/update" method="post">
 
@@ -33,66 +44,151 @@
                name="id"
                th:value="${card.id}">
 
-        <p>Question 1</p>
-        <input type="text"
-               name="question1"
-               th:value="${card.question1}">
+        <div class="question-block">
 
-        <p>Answer 1</p>
-        <textarea name="answer1"
-                  th:text="${card.answer1}">
-        </textarea>
+            <div class="question-title">
+                質問①
+            </div>
 
-        <p>Question 2</p>
-        <input type="text"
-               name="question2"
-               th:value="${card.question2}">
+            <input type="text"
+                   name="question1"
+                   th:value="${card.question1}">
 
-        <p>Answer 2</p>
-        <textarea name="answer2"
-                  th:text="${card.answer2}">
-        </textarea>
+        </div>
 
-        <p>Question 3</p>
-        <input type="text"
-               name="question3"
-               th:value="${card.question3}">
+        <div class="question-block">
 
-        <p>Answer 3</p>
-        <textarea name="answer3"
-                  th:text="${card.answer3}">
-        </textarea>
+            <div class="question-title">
+                回答①
+            </div>
 
-        <p>Question 4</p>
-        <input type="text"
-               name="question4"
-               th:value="${card.question4}">
+            <textarea class="answer-area"
+                      name="answer1"
+                      th:text="${card.answer1}">
+    </textarea>
 
-        <p>Answer 4</p>
-        <textarea name="answer4"
-                  th:text="${card.answer4}">
-        </textarea>
+        </div>
 
-        <p>Question 5</p>
-        <input type="text"
-               name="question5"
-               th:value="${card.question5}">
+        <div class="question-block">
 
-        <p>Answer 5</p>
-        <textarea name="answer5"
-                  th:text="${card.answer5}">
-        </textarea>
+            <div class="question-title">
+                質問②
+            </div>
 
-        <p>Impressions</p>
-        <textarea name="impressions"
+            <input type="text"
+                   name="question2"
+                   th:value="${card.question2}">
+
+        </div>
+
+        <div class="question-block">
+
+            <div class="question-title">
+                回答②
+            </div>
+
+            <textarea class="answer-area"
+                      name="answer2"
+                      th:text="${card.answer2}">
+    </textarea>
+
+        </div>
+
+        <div class="question-block">
+
+            <div class="question-title">
+                質問③
+            </div>
+
+            <input type="text"
+                   name="question3"
+                   th:value="${card.question3}">
+
+        </div>
+
+        <div class="question-block">
+
+            <div class="question-title">
+                回答③
+            </div>
+
+            <textarea class="answer-area"
+                      name="answer3"
+                      th:text="${card.answer3}">
+    </textarea>
+
+        </div>
+
+        <div class="question-block">
+
+            <div class="question-title">
+                質問④
+            </div>
+
+            <input type="text"
+                   name="question4"
+                   th:value="${card.question4}">
+
+        </div>
+
+        <div class="question-block">
+
+            <div class="question-title">
+                回答④
+            </div>
+
+            <textarea class="answer-area"
+                      name="answer4"
+                      th:text="${card.answer4}">
+    </textarea>
+
+        </div>
+
+        <div class="question-block">
+
+            <div class="question-title">
+                質問⑤
+            </div>
+
+            <input type="text"
+                   name="question5"
+                   th:value="${card.question5}">
+
+        </div>
+
+        <div class="question-block">
+
+            <div class="question-title">
+                回答⑤
+            </div>
+
+            <textarea class="answer-area"
+                      name="answer5"
+                      th:text="${card.answer5}">
+    </textarea>
+
+        </div>
+
+        <div class="question-title">
+            所感
+        </div>
+        <textarea class="answer-area"
+                  name="impressions"
                   th:text="${card.impressions}">
         </textarea>
 
         <br><br>
 
-        <button type="submit">
-            Save
-        </button>
+        <div class="save-row">
+
+            <button type="submit"
+                    class="logout-btn">
+
+                保存
+
+            </button>
+
+        </div>
 
     </form>
 

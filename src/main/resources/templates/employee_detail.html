@@ -16,20 +16,19 @@
 
         <h2 th:text="${employee.name}"></h2>
 
-        <p><strong>メール：</strong>
+        <p><strong>メール:</strong>
             <span th:text="${employee.email}"></span>
         </p>
-
-        <p><strong>電話番号：</strong>
+        <p><strong>電話番号:</strong>
             <span th:text="${employee.phoneNumber}"></span>
         </p>
 
-        <p><strong>サイト：</strong>
+        <p><strong>現場:</strong>
             <span th:text="${employee.siteLocation}"></span>
         </p>
 
         <p>
-            <strong>ステータス：</strong>
+            <strong>ステータス:</strong>
 
             <span th:switch="${employee.status}">
 
@@ -55,17 +54,17 @@
         </p>
 
         <p>
-            <strong>インタビュー日：</strong>
+            <strong>インタビュー日:</strong>
             <span th:text="${employee.interviewDate}"></span>
         </p>
 
         <p>
-            <strong>インタビュー時間：</strong>
+            <strong>インタビュー時間:</strong>
             <span th:text="${employee.interviewTime}"></span>
         </p>
 
         <p>
-            <strong>Zoomリンク：</strong>
+            <strong>Zoom URL:</strong>
             <span th:text="${employee.zoomLink}"></span>
         </p>
 
@@ -89,11 +88,30 @@
 
                 <select name="status">
 
-                    <option value="NOT_CONTACTED">未連絡</option>
-                    <option value="CONTACTING">連絡中</option>
-                    <option value="AWAITING_REPLY">返信待ち</option>
-                    <option value="SCHEDULED">予定確定</option>
-                    <option value="COMPLETED">完了</option>
+                    <option value="NOT_CONTACTED"
+                            th:selected="${employee.status.name() == 'NOT_CONTACTED'}">
+                        未連絡
+                    </option>
+
+                    <option value="CONTACTING"
+                            th:selected="${employee.status.name() == 'CONTACTING'}">
+                        連絡中
+                    </option>
+
+                    <option value="AWAITING_REPLY"
+                            th:selected="${employee.status.name() == 'AWAITING_REPLY'}">
+                        返信待ち
+                    </option>
+
+                    <option value="SCHEDULED"
+                            th:selected="${employee.status.name() == 'SCHEDULED'}">
+                        予定確定
+                    </option>
+
+                    <option value="COMPLETED"
+                            th:selected="${employee.status.name() == 'COMPLETED'}">
+                        完了
+                    </option>
 
                 </select>
 
@@ -165,6 +183,77 @@
             <div class="report-block">
 
                 <div class="report-question">
+                    質問③
+                </div>
+
+                <div class="report-answer"
+                     th:text="${card.question3}">
+                </div>
+
+            </div>
+
+            <div class="report-block">
+
+                <div class="report-question">
+                    回答③
+                </div>
+
+                <div class="report-answer"
+                     th:text="${card.answer3}">
+                </div>
+
+            </div>
+
+            <div class="report-block">
+
+                <div class="report-question">
+                    質問④
+                </div>
+
+                <div class="report-answer"
+                     th:text="${card.question4}">
+                </div>
+
+            </div>
+
+            <div class="report-block">
+
+                <div class="report-question">
+                    回答④
+                </div>
+
+                <div class="report-answer"
+                     th:text="${card.answer4}">
+                </div>
+            </div>
+
+            <div class="report-block">
+
+                <div class="report-question">
+                    質問⑤
+                </div>
+
+                <div class="report-answer"
+                     th:text="${card.question5}">
+                </div>
+
+            </div>
+
+            <div class="report-block">
+
+                <div class="report-question">
+                    回答⑤
+                </div>
+
+                <div class="report-answer"
+                     th:text="${card.answer5}">
+                </div>
+            </div>
+
+
+            <div class="report-block">
+
+                <div class="report-question">
                     所感
                 </div>
 
@@ -176,8 +265,16 @@
 
         </div>
 
-        <div th:if="${card == null}">
-            パーソナルレポート未作成
+        <div class="action-buttons"
+             th:if="${card != null}">
+
+            <a th:href="@{'/interviewcards#card-' + ${card.id}}"
+               class="action-btn">
+
+                パーソナルレポートを編集
+
+            </a>
+
         </div>
 
     </div>
