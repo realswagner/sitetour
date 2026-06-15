@@ -12,6 +12,8 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    //prevents duplicate username errors
+    @Column(unique = true)
     private String username;
 
     private String password;

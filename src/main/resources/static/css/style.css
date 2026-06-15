@@ -304,3 +304,54 @@ label {
     font-weight: bold;
     color: #4caf50;
 }
+
+.team-dashboard-grid {
+
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+}
+
+.team-dashboard-card {
+
+    flex: 1;
+    min-width: 260px;
+
+    background: white;
+
+    border-radius: 12px;
+
+    padding: 20px;
+
+    box-shadow:
+            0 2px 8px rgba(0,0,0,0.08);
+}
+
+.team-dashboard-card h3 {
+
+    margin-top: 0;
+    margin-bottom: 15px;
+
+    text-align: center;
+}
+
+.team-stat-row {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    padding: 8px 0;
+
+    border-bottom: 1px solid #eee;
+}
+
+.team-stat-total {
+
+    margin-top: 15px;
+
+    font-weight: bold;
+
+    text-align: center;
+}

@@ -8,6 +8,7 @@ import com.sitetour.sitetourapplication.repository.EmployeeRepository;
 import com.sitetour.sitetourapplication.repository.TeamRepository;
 import com.sitetour.sitetourapplication.entity.InterviewCard;
 import com.sitetour.sitetourapplication.repository.InterviewCardRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 
@@ -141,6 +142,19 @@ public class EmployeeService {
         if (name == null || name.trim().isEmpty()) {
             throw new RuntimeException("Name is required");
         }
+    }
+
+    @Transactional
+    public void deleteEmployee(Long employeeId) {
+
+        Employee employee =
+                employeeRepository.findById(employeeId)
+                        .orElseThrow();
+
+        interviewCardRepository
+                .deleteByEmployeeId(employeeId);
+
+        employeeRepository.delete(employee);
     }
 
     //dashboard status counting logic:

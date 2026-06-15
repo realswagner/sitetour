@@ -3,6 +3,7 @@ package com.sitetour.sitetourapplication.controller;
 import com.sitetour.sitetourapplication.entity.InterviewCard;
 import com.sitetour.sitetourapplication.entity.User;
 import com.sitetour.sitetourapplication.repository.UserRepository;
+import com.sitetour.sitetourapplication.service.AuditLogService;
 import com.sitetour.sitetourapplication.service.InterviewCardService;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -16,13 +17,16 @@ public class InterviewCardController {
 
     private final InterviewCardService interviewCardService;
     private final UserRepository userRepository;
+    private final AuditLogService auditLogService;;
 
     public InterviewCardController(
             InterviewCardService interviewCardService,
-            UserRepository userRepository
+            UserRepository userRepository,
+            AuditLogService auditLogService
     ) {
         this.interviewCardService = interviewCardService;
         this.userRepository = userRepository;
+        this.auditLogService = auditLogService;
     }
 
 
@@ -92,6 +96,36 @@ public class InterviewCardController {
         InterviewCard card =
                 interviewCardService.getCardById(id);
 
+        //details + if statements are audit log checking
+        //for detail saving on card update for log purposes
+        String details =
+                "Employee="
+                        + card.getEmployee().getName();
+
+        if (answer1 != null && !answer1.isBlank()) {
+            details += " | Q1 Answer Updated";
+        }
+
+        if (answer2 != null && !answer2.isBlank()) {
+            details += " | Q2 Answer Updated";
+        }
+
+        if (answer3 != null && !answer3.isBlank()) {
+            details += " | Q3 Answer Updated";
+        }
+
+        if (answer4 != null && !answer4.isBlank()) {
+            details += " | Q4 Answer Updated";
+        }
+
+        if (answer5 != null && !answer5.isBlank()) {
+            details += " | Q5 Answer Updated";
+        }
+
+        if (impressions != null && !impressions.isBlank()) {
+            details += " | Impressions Updated";
+        }
+
         // security check
 
         if (!isAdmin &&
@@ -122,7 +156,17 @@ public class InterviewCardController {
 
         card.setImpressions(impressions);
 
+        System.out.println(details);
+        //save changes to audit log
+        auditLogService.log(
+                user.getUsername(),
+                user.getTeam().getName(),
+                "INTERVIEW_CARD_UPDATED",
+                details
+        );
+
         interviewCardService.save(card);
+
 
         return "redirect:/interviewcards#card-" + card.getId();
     }

@@ -21,6 +21,8 @@ import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
+import com.sitetour.sitetourapplication.dto.TeamDashboardStats;
+import java.util.ArrayList;
 
 import java.util.List;
 
@@ -90,6 +92,32 @@ public class DashboardController {
         model.addAttribute("isAdmin", isAdmin);
 
         model.addAttribute("stats", stats);
+        //different dashboard display depending on user
+        //***********************************************
+        if (isAdmin) {
+
+            List<TeamDashboardStats> teamStats =
+                    new ArrayList<>();
+
+            teamService.getAllTeams()
+                    .forEach(team -> {
+
+                        teamStats.add(
+                                new TeamDashboardStats(
+                                        team,
+                                        employeeService.getDashboardStatsByTeam(
+                                                team.getId()
+                                        )
+                                )
+                        );
+
+                    });
+
+            model.addAttribute(
+                    "teamStats",
+                    teamStats
+            );
+        }
         model.addAttribute("teams", teamService.getAllTeams());
         model.addAttribute("selectedTeam", teamId);
 

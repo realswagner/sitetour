@@ -3,6 +3,8 @@ package com.sitetour.sitetourapplication.controller;
 import com.sitetour.sitetourapplication.entity.Employee;
 import com.sitetour.sitetourapplication.entity.InterviewCard;
 import com.sitetour.sitetourapplication.enums.InterviewStatus;
+import com.sitetour.sitetourapplication.repository.InterviewCardRepository;
+import com.sitetour.sitetourapplication.service.AuditLogService;
 import com.sitetour.sitetourapplication.service.EmployeeService;
 import com.sitetour.sitetourapplication.service.InterviewCardService;
 import com.sitetour.sitetourapplication.service.TeamService;
@@ -21,6 +23,7 @@ import org.springframework.security.core.Authentication;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 public class EmployeeController {
@@ -29,17 +32,23 @@ public class EmployeeController {
     private final TeamService teamService;
     private final InterviewCardService interviewCardService;
     private final UserRepository userRepository;
+    private final AuditLogService auditLogService;
+    private final InterviewCardRepository interviewCardRepository;
 
     public EmployeeController(
             EmployeeService employeeService,
             TeamService teamService,
             InterviewCardService interviewCardService,
-            UserRepository userRepository
+            UserRepository userRepository,
+            AuditLogService auditLogService,
+            InterviewCardRepository interviewCardRepository
     ){
         this.employeeService = employeeService;
         this.teamService = teamService;
         this.interviewCardService = interviewCardService;
         this.userRepository = userRepository;
+        this.auditLogService = auditLogService;
+        this.interviewCardRepository = interviewCardRepository;
     }
 
 
@@ -51,7 +60,7 @@ public class EmployeeController {
 
         return "create_employee";
     }
-    //navigates to create employee html page
+    //create and save new employee logic
     @PostMapping("/employees")
     public String saveEmployee(
             @RequestParam String name,
@@ -84,6 +93,13 @@ public class EmployeeController {
                 zoomLink,
                 teamId
         );
+        //creates audit log entry upon employee creation
+        auditLogService.log(
+                user.getUsername(),
+                user.getTeam().getName(),
+                "EMPLOYEE_CREATED",
+                "Created employee: " + name
+        );
 
         return "redirect:/employees";
     }
@@ -100,6 +116,8 @@ public class EmployeeController {
         User user = userRepository
                 .findByUsername(authentication.getName())
                 .orElseThrow();
+
+
 
         boolean isAdmin =
                 user.getRole().name().equals("ADMIN");
@@ -129,13 +147,17 @@ public class EmployeeController {
 
         Employee employee =
                 employeeService.getEmployeeById(id);
+        //audit log details need previous status for
+        //monitoring changes
+        InterviewStatus oldStatus =
+                employee.getStatus();
 
         User user = userRepository
                 .findByUsername(authentication.getName())
                 .orElseThrow();
-
         boolean isAdmin =
                 user.getRole().name().equals("ADMIN");
+
 
         if (!isAdmin &&
                 !employee.getTeam().getId()
@@ -145,6 +167,17 @@ public class EmployeeController {
         }
 
         employeeService.updateStatus(id, status);
+
+        auditLogService.log(
+                user.getUsername(),
+                user.getTeam().getName(),
+                "STATUS_CHANGED",
+                employee.getName()
+                        + " : "
+                        + oldStatus
+                        + " -> "
+                        + status
+        );
 
         return "redirect:/employees/" + id;
     }
@@ -193,6 +226,10 @@ public class EmployeeController {
     ) {
         Employee employee =
                 employeeService.getEmployeeById(id);
+        String oldEmail = employee.getEmail();
+        String oldPhone = employee.getPhoneNumber();
+        String oldLocation = employee.getSiteLocation();
+        InterviewStatus oldStatus = employee.getStatus();
 
         User user = userRepository
                 .findByUsername(authentication.getName())
@@ -219,6 +256,16 @@ public class EmployeeController {
                 interviewDate,
                 interviewTime,
                 zoomLink
+        );
+
+        auditLogService.log(
+                user.getUsername(),
+                user.getTeam().getName(),
+                "EMPLOYEE_UPDATED",
+                "Employee: " + employee.getName()
+                        + " | Email: " + oldEmail + " -> " + email
+                        + " | Phone: " + oldPhone + " -> " + phoneNumber
+                        + " | Location: " + oldLocation + " -> " + siteLocation
         );
 
         return "redirect:/employees/" + id;
@@ -281,4 +328,64 @@ public class EmployeeController {
         return "employees";
     }
 
+    @PostMapping("/employees/delete")
+    public String deleteEmployee(
+            @RequestParam Long id,
+            Authentication authentication
+    ) {
+
+        Employee employee =
+                employeeService.getEmployeeById(id);
+
+        User user = userRepository
+                .findByUsername(authentication.getName())
+                .orElseThrow();
+        String details =
+                "Name=" + employee.getName()
+                        + ", Status=" + employee.getStatus()
+                        + ", Date=" + employee.getInterviewDate()
+                        + ", Time=" + employee.getInterviewTime();
+
+        InterviewCard card =
+                interviewCardRepository
+                        .findByEmployeeId(id)
+                        .orElse(null);
+
+        if (card != null) {
+
+            details +=
+                    " | InterviewCard Exists";
+
+            if (card.getImpressions() != null) {
+
+                details +=
+                        " | Impressions="
+                                + card.getImpressions();
+            }
+            if (card.getAnswer1() != null && !card.getAnswer1().isBlank()) {
+                details += " | Q1 Answer=" + card.getAnswer1();
+            }
+            if (card.getAnswer2() != null && !card.getAnswer2().isBlank()) {
+                details += " | Q2 Answer=" + card.getAnswer2();
+            }
+            if (card.getAnswer3() != null && !card.getAnswer3().isBlank()) {
+                details += " | Q3 Answer=" + card.getAnswer3();
+            }
+            if (card.getAnswer4() != null && !card.getAnswer4().isBlank()) {
+                details += " | Q4 Answer=" + card.getAnswer4();
+            }
+            if (card.getAnswer5() != null && !card.getAnswer5().isBlank()) {
+                details += " | Q5 Answer=" + card.getAnswer5();
+            }
+        }
+        auditLogService.log(
+                user.getUsername(),
+                user.getTeam().getName(),
+                "EMPLOYEE_DELETED",
+                details
+        );
+        employeeService.deleteEmployee(id);
+
+        return "redirect:/employees";
+    }
 }

@@ -32,35 +32,6 @@
         </div>
     </div>
 
-    <!-- Admin only filter -->
-
-    <div class="section-card" th:if="${isAdmin}">
-        <h3>チームフィルター</h3>
-
-        <form method="get" action="/dashboard">
-
-            <select name="teamId">
-
-                <option value="">
-                    全チーム
-                </option>
-
-                <option
-                        th:each="team : ${teams}"
-                        th:value="${team.id}"
-                        th:text="${team.name}"
-                        th:selected="${team.id == selectedTeam}">
-                </option>
-
-            </select>
-
-            <button type="submit" class="logout-btn">
-                表示
-            </button>
-
-        </form>
-    </div>
-
     <!-- Today's interviews -->
 
     <div class="section-card">
@@ -83,6 +54,73 @@
                 <span th:text="${employee.interviewTime}"></span>
                 ）
             </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- admin specific status cards for each team-->
+    <div th:if="${isAdmin}">
+
+        <h2 style="margin-bottom:15px;">
+            チーム別進捗状況
+        </h2>
+
+        <div class="team-dashboard-grid">
+
+            <div class="team-dashboard-card"
+                 th:each="teamStat : ${teamStats}">
+
+                <h3 th:text="${teamStat.team.name}">
+                    Team
+                </h3>
+
+                <div class="team-stat-row">
+                    <span>未連絡</span>
+                    <strong th:text="${teamStat.stats.notContacted}"></strong>
+                </div>
+
+                <div class="team-stat-row">
+                    <span>連絡中</span>
+                    <strong th:text="${teamStat.stats.contacting}"></strong>
+                </div>
+
+                <div class="team-stat-row">
+                    <span>返信待ち</span>
+                    <strong th:text="${teamStat.stats.awaitingReply}"></strong>
+                </div>
+
+                <div class="team-stat-row">
+                    <span>日程確定</span>
+                    <strong th:text="${teamStat.stats.scheduled}"></strong>
+                </div>
+
+                <div class="team-stat-row">
+                    <span>完了</span>
+                    <strong th:text="${teamStat.stats.completed}"></strong>
+                </div>
+
+                <div class="team-stat-total">
+
+                    合計：
+                    <span th:text="${teamStat.stats.notContacted
+                         + teamStat.stats.contacting
+                         + teamStat.stats.awaitingReply
+                         + teamStat.stats.scheduled
+                         + teamStat.stats.completed}">
+                </span>
+
+                </div>
+
+                <a th:href="@{/employees(teamId=${teamStat.team.id})}"
+                   class="action-btn"
+                   style="margin-top:15px; display:inline-block;">
+
+                    社員一覧
+
+                </a>
 
             </div>
 

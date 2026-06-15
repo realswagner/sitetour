@@ -32,8 +32,9 @@ public class TeamService {
         this.userRepository = userRepository;
     }
 
+    //order by id - order created
     public List<Team> getAllTeams() {
-        return teamRepository.findAll();
+        return teamRepository.findAllByOrderByIdAsc();
     }
 
     public Team createTeam(String name) {
@@ -56,6 +57,21 @@ public class TeamService {
         teamRepository.delete(team);
     }
 
+    //rename team name
+    public void renameTeam(
+            Long teamId,
+            String newName
+    ) {
+
+        Team team = teamRepository
+                .findById(teamId)
+                .orElseThrow();
+
+        team.setName(newName);
+
+        teamRepository.save(team);
+    }
+
 
     @PostConstruct
     public void initTeams() {
@@ -70,4 +86,21 @@ public class TeamService {
         return teamRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Team not found"));
     }
+
+    //updates admin view team notes (members)
+    public void updateTeamNotes(
+            Long teamId,
+            String memberNotes
+    ) {
+
+        Team team = teamRepository
+                .findById(teamId)
+                .orElseThrow();
+
+        team.setMemberNotes(memberNotes);
+
+        teamRepository.save(team);
+    }
+
+
 }

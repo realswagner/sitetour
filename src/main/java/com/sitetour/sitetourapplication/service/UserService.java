@@ -45,6 +45,14 @@ public class UserService {
 
     public void createTeamUser(String username, String password, Team team) {
 
+        //check for duplicate username/avoid bad data entry
+        if (userRepository.findByUsername(username).isPresent()) {
+
+            throw new RuntimeException(
+                    "Username already exists"
+            );
+        }
+
         User user = new User();
 
         user.setUsername(username);
@@ -75,6 +83,13 @@ public class UserService {
 
     public void createTeamUser(String username, String password, Long teamId) {
 
+        if (userRepository.findByUsername(username).isPresent()) {
+
+            throw new RuntimeException(
+                    "Username already exists"
+            );
+        }
+
         Team team = teamRepository.findById(teamId)
                 .orElseThrow();
 
@@ -83,6 +98,44 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(password));
         user.setRole(Role.TEAM);
         user.setTeam(team);
+        userRepository.save(user);
+    }
+    // reset password method
+    public void resetTeamPassword(
+            Long teamId,
+            String newPassword
+    ) {
+
+        User user = userRepository
+                .findByTeamId(teamId)
+                .orElseThrow();
+
+        user.setPassword(
+                passwordEncoder.encode(newPassword)
+        );
+
+        userRepository.save(user);
+    }
+
+    //update user login ID
+    public void updateUsername(
+            Long teamId,
+            String username
+    ) {
+
+        if (userRepository.findByUsername(username)
+                .isPresent()) {
+
+            throw new RuntimeException(
+                    "Username already exists"
+            );
+        }
+
+        User user = userRepository
+                .findByTeamId(teamId)
+                .orElseThrow();
+
+        user.setUsername(username);
 
         userRepository.save(user);
     }

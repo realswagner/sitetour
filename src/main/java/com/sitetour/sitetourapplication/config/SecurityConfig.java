@@ -27,6 +27,12 @@ public class SecurityConfig {
 
                         // ADMIN ONLY
                         .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers(
+                                "/login",
+                                "/css/**",
+                                "/js/**",
+                                "/images/**"
+                        ).permitAll()
 
                         // BOTH ADMIN + TEAM
                         .requestMatchers("/employees/**").hasAnyRole("ADMIN", "TEAM")

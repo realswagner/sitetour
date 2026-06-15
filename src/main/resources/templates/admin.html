@@ -9,6 +9,20 @@
     <h1 class="page-title">
         管理者パネル
     </h1>
+    <!-- error alert -->
+    <div th:if="${param.error}"
+         style="color:red; margin-bottom:15px;">
+
+        パスワードが一致しません
+
+    </div>
+    <!-- password reset success message-->
+    <div th:if="${param.success}"
+         style="color:green; margin-bottom:15px;">
+
+        パスワードを変更しました
+
+    </div>
 
     <div class="section-card">
 
@@ -40,6 +54,13 @@
                        name="password"
                        required>
             </div>
+            <div class="form-group">
+                <label>パスワード確認</label>
+
+                <input type="password"
+                       name="confirmPassword"
+                       required>
+            </div>
 
             <button type="submit"
                     class="logout-btn">
@@ -54,58 +75,224 @@
 
         <h2>チーム一覧</h2>
 
-        <table class="employee-table">
+        <div th:each="team : ${teams}"
+             class="section-card"
+             style="margin-bottom:15px; padding:20px;">
 
-            <thead>
+            <h3 th:text="${team.name}">
+                Team Name
+            </h3>
 
-            <tr>
-                <th>ID</th>
-                <th>チーム名</th>
-                <th>操作</th>
-            </tr>
+            <p>
+                Login ID:
+                <strong
+                        th:text="${teamLogins[team.id]}">
+                </strong>
+            </p>
 
-            </thead>
+            <p style="color:#777; margin-top:-5px;">
+                ID:
+                <span th:text="${team.id}"></span>
+            </p>
 
-            <tbody>
+            <form action="/admin/teams/update-notes"
+                  method="post">
 
-            <tr th:each="team : ${teams}">
+                <input type="hidden"
+                       th:name="${_csrf.parameterName}"
+                       th:value="${_csrf.token}" />
 
-                <td th:text="${team.id}"></td>
+                <input type="hidden"
+                       name="teamId"
+                       th:value="${team.id}" />
 
-                <td th:text="${team.name}"></td>
+                <div class="form-group">
 
-                <td>
+                    <label>
+                        チームメンバー / メモ
+                    </label>
 
-                    <form action="/admin/teams/delete"
-                          method="post"
-                          onsubmit="return confirm('チームを削除しますか？');">
+                    <textarea
+                            name="memberNotes"
+                            rows="3"
+                            style="width:100%;"
+                            th:text="${team.memberNotes}">
+        </textarea>
 
-                        <input type="hidden"
-                               th:name="${_csrf.parameterName}"
-                               th:value="${_csrf.token}" />
+                </div>
 
-                        <input type="hidden"
-                               name="id"
-                               th:value="${team.id}" />
+                <button type="submit"
+                        class="logout-btn">
 
-                        <button type="submit"
-                                class="logout-btn">
-                            削除
-                        </button>
+                    メモ保存
 
-                    </form>
+                </button>
 
-                </td>
+            </form>
 
-            </tr>
+            <hr>
 
-            </tbody>
+            <h4 style="margin-top:15px;">
+                チーム名変更
+            </h4>
 
-        </table>
+            <form action="/admin/teams/rename"
+                  method="post"
+                  style="display:flex; gap:10px;">
+
+                <input type="hidden"
+                       th:name="${_csrf.parameterName}"
+                       th:value="${_csrf.token}" />
+
+                <input type="hidden"
+                       name="teamId"
+                       th:value="${team.id}" />
+
+                <input type="text"
+                       name="teamName"
+                       th:value="${team.name}"
+                       required>
+
+                <button type="submit"
+                        class="logout-btn">
+
+                    名前変更
+
+                </button>
+
+            </form>
+            <h4>ログインID変更</h4>
+
+            <form action="/admin/teams/update-login"
+                  method="post">
+
+                <input type="hidden"
+                       th:name="${_csrf.parameterName}"
+                       th:value="${_csrf.token}" />
+
+                <input type="hidden"
+                       name="teamId"
+                       th:value="${team.id}" />
+
+                <input type="text"
+                       name="username"
+                       th:value="${teamLogins[team.id]}"
+                       required>
+
+                <button type="submit"
+                        class="logout-btn">
+
+                    ログインID変更
+
+                </button>
+
+            </form>
+
+            <h4>パスワード変更</h4>
+
+            <form action="/admin/teams/reset-password"
+                  method="post">
+
+                <input type="hidden"
+                       th:name="${_csrf.parameterName}"
+                       th:value="${_csrf.token}" />
+
+                <input type="hidden"
+                       name="teamId"
+                       th:value="${team.id}" />
+
+                <div style="display:flex; gap:10px;">
+
+<!--                    <label>新しいパスワード</label>-->
+
+                    <input type="password"
+                           name="password"
+                           placeholder="新しいパスワード"
+                           required>
+
+                </div>
+
+                <div class="form-group">
+
+<!--                    <label>確認</label>-->
+
+                    <input type="password"
+                           name="confirmPassword"
+                           placeholder="新しいパスワード確認"
+                           required>
+
+                </div>
+
+                <button type="submit"
+                        class="logout-btn">
+
+                    パスワード変更
+
+                </button>
+
+            </form>
+
+            <br>
+
+            <h4 style="margin-top:15px; color:#d9534f;">
+                チーム削除
+            </h4>
+
+            <form action="/admin/teams/delete"
+                  method="post"
+                  onsubmit="return confirmDelete(this);"
+                  th:attr="data-team-name=${team.name}">
+
+                <input type="hidden"
+                       th:name="${_csrf.parameterName}"
+                       th:value="${_csrf.token}" />
+
+                <input type="hidden"
+                       name="teamId"
+                       th:value="${team.id}" />
+
+                <input type="text"
+                       name="confirmName"
+                       placeholder="チーム名を入力"
+                       required>
+
+                <button type="submit"
+                        class="logout-btn"
+                        style="background:#d9534f;">
+
+                    削除
+
+                </button>
+
+            </form>
+
+        </div>
 
     </div>
 
 </div>
+<script>
 
+    function confirmDelete(form) {
+
+        const teamName =
+            form.dataset.teamName;
+
+        const entered =
+            form.confirmName.value;
+
+        if (entered !== teamName) {
+
+            alert("チーム名が一致しません");
+
+            return false;
+        }
+
+        return confirm(
+            teamName + " を本当に削除しますか？"
+        );
+    }
+
+</script>
 </body>
 </html>

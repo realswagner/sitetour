@@ -12,6 +12,17 @@ public class Team {
 
     private String name;
 
+    public String getMemberNotes() {
+        return memberNotes;
+    }
+
+    public void setMemberNotes(String memberNotes) {
+        this.memberNotes = memberNotes;
+    }
+
+    @Column(length = 1000)
+    private String memberNotes;
+
     public Long getId() {
         return id;
     }

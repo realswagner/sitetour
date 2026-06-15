@@ -292,6 +292,29 @@
                class="action-btn">
                 編集
             </a>
+            <form th:action="@{/employees/delete}"
+                  method="post"
+                  onsubmit="return confirm('削除しますか？');">
+
+                <input type="hidden"
+                       th:name="${_csrf.parameterName}"
+                       th:value="${_csrf.token}" />
+
+                <input type="hidden"
+                       name="id"
+                       th:value="${employee.id}" />
+
+                <button type="submit"
+                        class="logout-btn">
+
+                    削除
+
+                </button>
+                <input type="text"
+                       name="confirmName"
+                       placeholder="氏名を入力">
+
+            </form>
 
         </div>
 

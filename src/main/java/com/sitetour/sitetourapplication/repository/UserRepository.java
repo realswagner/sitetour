@@ -10,5 +10,7 @@ public interface UserRepository
 
     Optional<User> findByUsername(String username);
 
+    Optional<User> findByTeamId(Long teamId);
+
     void deleteAllByTeamId(Long teamId);
 }
