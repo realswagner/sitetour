@@ -137,6 +137,8 @@ resource "aws_instance" "sitetour_server" {
   //ssh key pair
   key_name = aws_key_pair.sitetour_key.key_name
 
+  user_data = file("${path.module}/bootstrap.sh")
+
   tags = {
     Name = "SiteTour Server"
   }
