@@ -1,6 +1,8 @@
 package com.sitetour.sitetourapplication.service;
 
+import com.sitetour.sitetourapplication.entity.Employee;
 import com.sitetour.sitetourapplication.entity.InterviewCard;
+import com.sitetour.sitetourapplication.entity.User;
 import com.sitetour.sitetourapplication.repository.InterviewCardRepository;
 import org.springframework.stereotype.Service;
 
@@ -28,13 +30,7 @@ public class InterviewCardService {
                 .orElseThrow(() ->
                         new RuntimeException("Interview card not found"));
     }
-    public InterviewCard getCardByEmployeeId(Long employeeId) {
 
-        return interviewCardRepository
-                .findByEmployeeId(employeeId)
-                .orElseThrow(() ->
-                        new RuntimeException("Interview card not found"));
-    }
 
     public void save(InterviewCard card) {
         interviewCardRepository.save(card);
@@ -59,5 +55,53 @@ public class InterviewCardService {
     public List<InterviewCard> getCardsByTeam(Long teamId) {
         return interviewCardRepository
                 .findByEmployee_Team_IdOrderByEmployee_InterviewDateAsc(teamId);
+    }
+
+    //filters personal report cards by user
+    public InterviewCard getCardByEmployeeAndUser(
+
+            Long employeeId,
+            Long userId
+
+    ) {
+
+        return interviewCardRepository
+                .findByEmployeeIdAndOwnerId(
+                        employeeId,
+                        userId
+                )
+                .orElseThrow(
+                        () -> new RuntimeException(
+                                "Interview card not found"
+                        )
+                );
+    }
+
+
+    //separates team from user interview card / individual cards PER USER not team
+    public InterviewCard getOrCreateCard(
+
+            Employee employee,
+            User owner
+
+    ) {
+
+        return interviewCardRepository
+                .findByEmployeeIdAndOwnerId(
+                        employee.getId(),
+                        owner.getId()
+                )
+                .orElseGet(() -> {
+
+                    InterviewCard card =
+                            new InterviewCard();
+
+                    card.setEmployee(employee);
+
+                    card.setOwner(owner);
+
+                    return interviewCardRepository
+                            .save(card);
+                });
     }
 }

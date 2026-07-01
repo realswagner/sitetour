@@ -6,31 +6,50 @@
 </head>
 <body>
 <div th:replace="fragments/navbar :: navbar"></div>
-<h1 class="page-title">
-    パーソナルレポート
-</h1>
 
+<div class="container">
+    <h1 class="page-title">
+        パーソナルレポート
+    </h1>
+    <div th:if="${errorMessage}"
+         class="error-banner"
+         th:text="${errorMessage}">
+    </div>
+
+    <div th:if="${successMessage}"
+         class="success-banner"
+         th:text="${successMessage}">
+    </div>
 
 <div th:each="card : ${cards}"
      class="interview-card"
      th:id="'card-' + ${card.id}">
     <div class="interview-header">
 
-        <div class="interview-name"
-             th:text="${card.employee.name}">
-        </div>
-
         <div>
 
-            <strong>インタビュー日:</strong>
+        <span class="interview-name"
+              th:text="${card.employee.name}">
+        </span>
+
+            -
 
             <span th:text="${#temporals.format(
-            card.employee.interviewDate,
-            'yyyy/MM/dd'
+                card.employee.interviewDate,
+                'yyyy/MM/dd'
         )}">
         </span>
 
         </div>
+
+        <button type="button"
+                class="logout-btn toggle-btn"
+                th:id="'card-btn-' + ${card.id}"
+                th:attr="onclick='toggleCard(' + ${card.id} + ')'">
+
+            開く
+
+        </button>
 
     </div>
 
@@ -43,6 +62,8 @@
         <input type="hidden"
                name="id"
                th:value="${card.id}">
+        <div th:id="'card-content-' + ${card.id}"
+             style="display:none;">
 
         <div class="question-block">
 
@@ -189,12 +210,47 @@
             </button>
 
         </div>
-
+        </div>
     </form>
 
-    <hr>
-
+</div>
 </div>
 
+<script>
+
+    function toggleCard(cardId) {
+
+        const card =
+            document.getElementById(
+                "card-content-" + cardId
+            );
+
+        const button =
+            document.getElementById(
+                "card-btn-" + cardId
+            );
+
+        const opening =
+            card.style.display === "none"
+            || card.style.display === "";
+
+        if (opening) {
+
+            card.style.display = "block";
+
+            button.classList.add("active");
+
+            button.textContent = "閉じる";
+
+        } else {
+
+            card.style.display = "none";
+
+            button.classList.remove("active");
+
+            button.textContent = "開く";
+        }
+    }
+</script>
 </body>
 </html>

@@ -1,70 +1,120 @@
+<!DOCTYPE html>
 
-<!DOCTYPE html> <html xmlns:th="http://www.thymeleaf.org"> <head> <title>Admin Dashboard</title> <link rel="stylesheet" th:href="@{/css/style.css}"> </head>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>管理パネル</title>
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
 <body>
-
 <div th:replace="~{fragments/navbar :: navbar}"></div>
 
-<div class="container">
+<div class="admin-content">
+<div class="admin-nav-grid">
 
-    <h1 class="page-title">
-        管理者パネル
-    </h1>
-    <!-- error alert -->
-    <div th:if="${param.error}"
-         style="color:red; margin-bottom:15px;">
+    <a class="admin-nav-card"
+       href="/admin/teams">
 
-        パスワードが一致しません
+        <h3>チーム管理</h3>
+        <p>
+            チーム・ユーザー管理
+        </p>
 
-    </div>
-    <!-- password reset success message-->
-    <div th:if="${param.success}"
-         style="color:green; margin-bottom:15px;">
+    </a>
 
-        パスワードを変更しました
+    <a class="admin-nav-card"
+       href="/admin/auditlogs">
 
-    </div>
+        <h3>監査ログ</h3>
+        <p>
+            システム操作履歴
+        </p>
+
+    </a>
+
+    <a class="admin-nav-card"
+       href="/admin/schedules">
+
+        <h3>面談スケジュール</h3>
+        <p>
+            全チーム予定確認
+        </p>
+
+    </a>
+
+</div>
 
     <div class="section-card">
 
-        <h2>チーム作成</h2>
+        <h2>
+            最近のアクティビティ
+        </h2>
 
-        <form action="/admin/teams/create" method="post">
+        <div th:each="log : ${recentLogs}"
+             style="padding:8px 0; border-bottom:1px solid #eee;">
 
-            <input type="hidden"
-                   th:name="${_csrf.parameterName}"
-                   th:value="${_csrf.token}" />
+            <strong th:text="${log.action}">
+            </strong>
 
-            <div class="form-group">
-                <label>チーム名</label>
-                <input type="text"
-                       name="teamName"
-                       required>
-            </div>
+            <br>
 
-            <div class="form-group">
-                <label>ログインID</label>
-                <input type="text"
-                       name="username"
-                       required>
-            </div>
+            <span th:text="${log.details}">
+    </span>
 
-            <div class="form-group">
-                <label>パスワード</label>
-                <input type="password"
-                       name="password"
-                       required>
-            </div>
-            <div class="form-group">
-                <label>パスワード確認</label>
+        </div>
 
-                <input type="password"
-                       name="confirmPassword"
-                       required>
-            </div>
+    </div>
+    <div class="section-card">
+
+        <h2>データ出力</h2>
+
+        <form action="/admin/export/employees"
+              method="get">
+
+            <select name="teamId">
+
+                <option value="">
+                    全チーム
+                </option>
+
+                <option th:each="team : ${teams}"
+                        th:value="${team.id}"
+                        th:text="${team.name}">
+                </option>
+
+            </select>
 
             <button type="submit"
                     class="logout-btn">
-                チーム作成
+
+                CSV出力
+
+            </button>
+
+        </form>
+
+        <form action="/admin/export/employees/excel"
+              method="get">
+
+            <select name="teamId">
+
+                <option value="">
+                    全チーム
+                </option>
+
+                <option th:each="team : ${teams}"
+                        th:value="${team.id}"
+                        th:text="${team.name}">
+                </option>
+
+            </select>
+
+            <button type="submit"
+                    class="logout-btn">
+
+                Excel出力
+
             </button>
 
         </form>
@@ -73,226 +123,46 @@
 
     <div class="section-card">
 
-        <h2>チーム一覧</h2>
+        <h2>チーム概要</h2>
 
-        <div th:each="team : ${teams}"
-             class="section-card"
-             style="margin-bottom:15px; padding:20px;">
+        <div class="team-dashboard-grid">
 
-            <h3 th:text="${team.name}">
-                Team Name
-            </h3>
+            <div class="team-dashboard-card"
+                 th:each="team : ${teams}">
 
-            <p>
-                Login ID:
-                <strong
-                        th:text="${teamLogins[team.id]}">
-                </strong>
-            </p>
+                <h3 th:text="${team.name}">
+                </h3>
 
-            <p style="color:#777; margin-top:-5px;">
-                ID:
-                <span th:text="${team.id}"></span>
-            </p>
+                <p>
+                    ユーザー数：
+                    <span th:text="${teamUsers[team.id].size()}">
+        </span>
+                </p>
 
-            <form action="/admin/teams/update-notes"
-                  method="post">
+                <div style="margin-top:12px;">
 
-                <input type="hidden"
-                       th:name="${_csrf.parameterName}"
-                       th:value="${_csrf.token}" />
+                    <div style="margin-top:10px; color:#666;">
 
-                <input type="hidden"
-                       name="teamId"
-                       th:value="${team.id}" />
+                        <span th:each="user, stat : ${teamUsers[team.id]}">
 
-                <div class="form-group">
+                        <span th:text="${user.username}"></span>
+                            <span th:if="${!stat.last}">
+                              ,
+                            </span>
 
-                    <label>
-                        チームメンバー / メモ
-                    </label>
+                        </span>
 
-                    <textarea
-                            name="memberNotes"
-                            rows="3"
-                            style="width:100%;"
-                            th:text="${team.memberNotes}">
-        </textarea>
+                    </div>
 
                 </div>
 
-                <button type="submit"
-                        class="logout-btn">
-
-                    メモ保存
-
-                </button>
-
-            </form>
-
-            <hr>
-
-            <h4 style="margin-top:15px;">
-                チーム名変更
-            </h4>
-
-            <form action="/admin/teams/rename"
-                  method="post"
-                  style="display:flex; gap:10px;">
-
-                <input type="hidden"
-                       th:name="${_csrf.parameterName}"
-                       th:value="${_csrf.token}" />
-
-                <input type="hidden"
-                       name="teamId"
-                       th:value="${team.id}" />
-
-                <input type="text"
-                       name="teamName"
-                       th:value="${team.name}"
-                       required>
-
-                <button type="submit"
-                        class="logout-btn">
-
-                    名前変更
-
-                </button>
-
-            </form>
-            <h4>ログインID変更</h4>
-
-            <form action="/admin/teams/update-login"
-                  method="post">
-
-                <input type="hidden"
-                       th:name="${_csrf.parameterName}"
-                       th:value="${_csrf.token}" />
-
-                <input type="hidden"
-                       name="teamId"
-                       th:value="${team.id}" />
-
-                <input type="text"
-                       name="username"
-                       th:value="${teamLogins[team.id]}"
-                       required>
-
-                <button type="submit"
-                        class="logout-btn">
-
-                    ログインID変更
-
-                </button>
-
-            </form>
-
-            <h4>パスワード変更</h4>
-
-            <form action="/admin/teams/reset-password"
-                  method="post">
-
-                <input type="hidden"
-                       th:name="${_csrf.parameterName}"
-                       th:value="${_csrf.token}" />
-
-                <input type="hidden"
-                       name="teamId"
-                       th:value="${team.id}" />
-
-                <div style="display:flex; gap:10px;">
-
-<!--                    <label>新しいパスワード</label>-->
-
-                    <input type="password"
-                           name="password"
-                           placeholder="新しいパスワード"
-                           required>
-
-                </div>
-
-                <div class="form-group">
-
-<!--                    <label>確認</label>-->
-
-                    <input type="password"
-                           name="confirmPassword"
-                           placeholder="新しいパスワード確認"
-                           required>
-
-                </div>
-
-                <button type="submit"
-                        class="logout-btn">
-
-                    パスワード変更
-
-                </button>
-
-            </form>
-
-            <br>
-
-            <h4 style="margin-top:15px; color:#d9534f;">
-                チーム削除
-            </h4>
-
-            <form action="/admin/teams/delete"
-                  method="post"
-                  onsubmit="return confirmDelete(this);"
-                  th:attr="data-team-name=${team.name}">
-
-                <input type="hidden"
-                       th:name="${_csrf.parameterName}"
-                       th:value="${_csrf.token}" />
-
-                <input type="hidden"
-                       name="teamId"
-                       th:value="${team.id}" />
-
-                <input type="text"
-                       name="confirmName"
-                       placeholder="チーム名を入力"
-                       required>
-
-                <button type="submit"
-                        class="logout-btn"
-                        style="background:#d9534f;">
-
-                    削除
-
-                </button>
-
-            </form>
+            </div>
 
         </div>
 
     </div>
 
 </div>
-<script>
 
-    function confirmDelete(form) {
-
-        const teamName =
-            form.dataset.teamName;
-
-        const entered =
-            form.confirmName.value;
-
-        if (entered !== teamName) {
-
-            alert("チーム名が一致しません");
-
-            return false;
-        }
-
-        return confirm(
-            teamName + " を本当に削除しますか？"
-        );
-    }
-
-</script>
 </body>
 </html>

@@ -34,7 +34,7 @@
 
     <!-- Today's interviews -->
 
-    <div class="section-card">
+    <div class="section-card" th:unless="${isAdmin}">
 
         <h2>本日のインタビュー予定</h2>
 
@@ -130,7 +130,7 @@
 
     <!-- Status cards -->
 
-    <div class="stats-container">
+    <div class="stats-container" th:unless="${isAdmin}">
 
         <a class="stat-link"
            href="/employees?status=NOT_CONTACTED">
@@ -219,6 +219,68 @@
 
     </div>
 
+    <div class="section-card"
+         th:if="${!isAdmin}">
+
+        <div style="
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        margin-bottom:15px;
+    ">
+
+            <h2 style="margin:0;">
+                最近のアクティビティ
+            </h2>
+
+            <a href="/auditlogs"
+               class="employee-link">
+
+                すべて表示
+
+            </a>
+
+        </div>
+
+        <div th:if="${#lists.isEmpty(recentLogs)}">
+
+            <p style="color:#777;">
+                アクティビティはありません
+            </p>
+
+        </div>
+
+        <div th:each="log : ${recentLogs}"
+             style="
+            padding:10px 0;
+            border-bottom:1px solid #eee;
+    ">
+
+            <div style="
+            display:flex;
+            justify-content:space-between;
+            margin-bottom:4px;
+    ">
+
+                <strong th:text="${log.action}">
+                </strong>
+
+                <span style="color:#777;"
+                      th:text="${#temporals.format(
+                        log.timestamp,
+                        'MM/dd HH:mm'
+                  )}">
+            </span>
+
+            </div>
+
+            <div style="color:#666;"
+                 th:text="${log.details}">
+            </div>
+
+        </div>
+
+    </div>
     <br>
 
     <form action="/logout" method="post">
@@ -227,10 +289,6 @@
                 type="hidden"
                 th:name="${_csrf.parameterName}"
                 th:value="${_csrf.token}" />
-
-        <button type="submit" class="logout-btn">
-            ログアウト
-        </button>
 
     </form>
 

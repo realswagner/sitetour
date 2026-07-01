@@ -9,6 +9,15 @@
 <div th:replace="fragments/navbar :: navbar"></div>
 
 <div class="container">
+    <div th:if="${errorMessage}"
+         class="error-banner"
+         th:text="${errorMessage}">
+    </div>
+
+    <div th:if="${successMessage}"
+         class="success-banner"
+         th:text="${successMessage}">
+    </div>
 
     <div class="section-card form-container">
 

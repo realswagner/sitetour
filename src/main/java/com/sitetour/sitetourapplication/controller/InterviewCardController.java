@@ -2,6 +2,8 @@ package com.sitetour.sitetourapplication.controller;
 
 import com.sitetour.sitetourapplication.entity.InterviewCard;
 import com.sitetour.sitetourapplication.entity.User;
+import com.sitetour.sitetourapplication.enums.Role;
+import com.sitetour.sitetourapplication.repository.InterviewCardRepository;
 import com.sitetour.sitetourapplication.repository.UserRepository;
 import com.sitetour.sitetourapplication.service.AuditLogService;
 import com.sitetour.sitetourapplication.service.InterviewCardService;
@@ -9,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -18,15 +21,18 @@ public class InterviewCardController {
     private final InterviewCardService interviewCardService;
     private final UserRepository userRepository;
     private final AuditLogService auditLogService;;
+    private final InterviewCardRepository interviewCardRepository;
 
     public InterviewCardController(
             InterviewCardService interviewCardService,
             UserRepository userRepository,
-            AuditLogService auditLogService
+            AuditLogService auditLogService,
+            InterviewCardRepository interviewCardRepository
     ) {
         this.interviewCardService = interviewCardService;
         this.userRepository = userRepository;
         this.auditLogService = auditLogService;
+        this.interviewCardRepository = interviewCardRepository;
     }
 
 
@@ -48,9 +54,11 @@ public class InterviewCardController {
         if (isAdmin) {
             cards = interviewCardService.getAllCardsOrdered();
         } else {
-            cards = interviewCardService.getCardsByTeam(
-                    user.getTeam().getId()
-            );
+            cards =
+                    interviewCardRepository
+                            .findByOwnerIdOrderByEmployee_InterviewDateAsc(
+                                    user.getId()
+                            );
         }
 
         model.addAttribute("cards", cards);
@@ -83,7 +91,8 @@ public class InterviewCardController {
 
             @RequestParam(required = false) String impressions,
 
-            Authentication authentication
+            Authentication authentication,
+            RedirectAttributes redirectAttributes
     ) {
 
         User user = userRepository
@@ -100,7 +109,11 @@ public class InterviewCardController {
         //for detail saving on card update for log purposes
         String details =
                 "Employee="
-                        + card.getEmployee().getName();
+                        + card.getEmployee().getName()
+                        + " | CardOwner="
+                        + card.getOwner().getUsername()
+                        + " | UpdatedBy="
+                        + user.getUsername();
 
         if (answer1 != null && !answer1.isBlank()) {
             details += " | Q1 Answer Updated";
@@ -128,13 +141,14 @@ public class InterviewCardController {
 
         // security check
 
-        if (!isAdmin &&
-                !card.getEmployee()
-                        .getTeam()
-                        .getId()
-                        .equals(user.getTeam().getId())) {
+        if (user.getRole() == Role.ADMIN) {
 
-            return "redirect:/interviewcards";
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    "管理者はパーソナルレポートを編集できません"
+            );
+
+            return "redirect:/dashboard";
         }
 
         //update fields

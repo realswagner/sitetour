@@ -3,6 +3,7 @@ package com.sitetour.sitetourapplication.controller;
 import com.sitetour.sitetourapplication.entity.Employee;
 import com.sitetour.sitetourapplication.entity.InterviewCard;
 import com.sitetour.sitetourapplication.enums.InterviewStatus;
+import com.sitetour.sitetourapplication.enums.Role;
 import com.sitetour.sitetourapplication.repository.InterviewCardRepository;
 import com.sitetour.sitetourapplication.service.AuditLogService;
 import com.sitetour.sitetourapplication.service.EmployeeService;
@@ -20,9 +21,12 @@ import java.time.LocalTime;
 import com.sitetour.sitetourapplication.entity.User;
 import com.sitetour.sitetourapplication.repository.UserRepository;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Controller
@@ -54,9 +58,29 @@ public class EmployeeController {
 
 
     @GetMapping("/employees/new")
-    public String createEmployeeForm(Model model) {
+    public String createEmployeeForm(
+            Authentication authentication,
+            Model model) {
 
-        model.addAttribute("teams", teamService.getAllTeams());
+        User user =
+                userRepository
+                        .findByUsername(
+                                authentication.getName()
+                        )
+                        .orElseThrow();
+
+        boolean isAdmin =
+                user.getRole().name().equals("ADMIN");
+
+        model.addAttribute(
+                "teams",
+                teamService.getAllTeams()
+        );
+
+        model.addAttribute(
+                "isAdmin",
+                isAdmin
+        );
 
         return "create_employee";
     }
@@ -81,24 +105,34 @@ public class EmployeeController {
 
         Long teamId = user.getTeam().getId();
 
-        employeeService.createEmployee(
-                name,
-                email,
-                phoneNumber,
-                siteLocation,
-                status,
-                proposedDates,
-                interviewDate,
-                interviewTime,
-                zoomLink,
-                teamId
+
+        Employee employee =
+                employeeService.createEmployee(
+                        name,
+                        email,
+                        phoneNumber,
+                        siteLocation,
+                        status,
+                        proposedDates,
+                        interviewDate,
+                        interviewTime,
+                        zoomLink,
+                        teamId
+                );
+        interviewCardService.getOrCreateCard(
+                employee,
+                user
         );
+
+        String details =
+                "Employee=" + employee.getName()
+                        + " | Owner=" + user.getUsername();
         //creates audit log entry upon employee creation
         auditLogService.log(
                 user.getUsername(),
                 user.getTeam().getName(),
-                "EMPLOYEE_CREATED",
-                "Created employee: " + name
+                "EMPLOYEE_CREATED", details
+
         );
 
         return "redirect:/employees";
@@ -128,11 +162,16 @@ public class EmployeeController {
 
             return "redirect:/employees";
         }
+        model.addAttribute("isAdmin", isAdmin);
 
         model.addAttribute("employee", employee);
 
         InterviewCard card =
-                interviewCardService.getCardByEmployeeId(id);
+                interviewCardService
+                        .getOrCreateCard(
+                                employee,
+                                user
+                        );
 
         model.addAttribute("card", card);
 
@@ -143,7 +182,8 @@ public class EmployeeController {
     public String updateStatus(
             @RequestParam Long id,
             @RequestParam InterviewStatus status,
-            Authentication authentication) {
+            Authentication authentication,
+            RedirectAttributes redirectAttributes) {
 
         Employee employee =
                 employeeService.getEmployeeById(id);
@@ -159,9 +199,12 @@ public class EmployeeController {
                 user.getRole().name().equals("ADMIN");
 
 
-        if (!isAdmin &&
-                !employee.getTeam().getId()
-                        .equals(user.getTeam().getId())) {
+        if (user.getRole() == Role.ADMIN) {
+
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    "管理者は社員情報を編集できません"
+            );
 
             return "redirect:/employees";
         }
@@ -172,7 +215,10 @@ public class EmployeeController {
                 user.getUsername(),
                 user.getTeam().getName(),
                 "STATUS_CHANGED",
-                employee.getName()
+                "UpdatedBy="
+                        + user.getUsername()
+                        + " | Employee="
+                        + employee.getName()
                         + " : "
                         + oldStatus
                         + " -> "
@@ -186,7 +232,8 @@ public class EmployeeController {
     public String showEditForm(
             @PathVariable Long id,
             Authentication authentication,
-            Model model) {
+            Model model,
+            RedirectAttributes redirectAttributes) {
 
         Employee employee =
                 employeeService.getEmployeeById(id);
@@ -198,18 +245,23 @@ public class EmployeeController {
         boolean isAdmin =
                 user.getRole().name().equals("ADMIN");
 
-        if (!isAdmin &&
-                !employee.getTeam().getId()
-                        .equals(user.getTeam().getId())) {
+        if (user.getRole() == Role.ADMIN) {
+
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    "管理者は社員情報を編集できません"
+            );
 
             return "redirect:/employees";
         }
+        model.addAttribute("isAdmin", isAdmin);
 
         model.addAttribute("employee", employee);
 
         return "employee-edit";
     }
 
+    //employee update page logic
     @PostMapping("/employees/update")
     public String updateEmployee(
             @RequestParam Long id,
@@ -237,7 +289,7 @@ public class EmployeeController {
 
         boolean isAdmin =
                 user.getRole().name().equals("ADMIN");
-
+        //admin doesn't handle employee updates - left to user/team
         if (!isAdmin &&
                 !employee.getTeam().getId()
                         .equals(user.getTeam().getId())) {
@@ -265,12 +317,15 @@ public class EmployeeController {
                 "Employee: " + employee.getName()
                         + " | Email: " + oldEmail + " -> " + email
                         + " | Phone: " + oldPhone + " -> " + phoneNumber
-                        + " | Location: " + oldLocation + " -> " + siteLocation
+                        + " | Location: " + oldLocation + " -> " + siteLocation + "UpdatedBy="
+                        + user.getUsername()
+                        + " | Employee="
+                        + employee.getName()
         );
 
         return "redirect:/employees/" + id;
     }
-
+    //employee db fetching logic
     @GetMapping("/employees")
     public String getEmployees(
             @RequestParam(required = false) InterviewStatus status,
@@ -287,17 +342,36 @@ public class EmployeeController {
                 user.getRole().name().equals("ADMIN");
 
         List<Employee> employees;
-
+        //admin can view entire employee list and filter by team
         if (isAdmin) {
 
-            if (teamId != null) {
-                employees = employeeService.getEmployeesByTeam(teamId);
+            if (teamId != null && status != null) {
+
+                employees =
+                        employeeService
+                                .getEmployeesByTeam(teamId)
+                                .stream()
+                                .filter(e -> e.getStatus() == status)
+                                .toList();
+
+            }
+            else if (teamId != null) {
+
+                employees =
+                        employeeService.getEmployeesByTeam(teamId);
+
             }
             else if (status != null) {
-                employees = employeeService.getEmployeesByStatus(status);
+
+                employees =
+                        employeeService.getEmployeesByStatus(status);
+
             }
             else {
-                employees = employeeService.getAllEmployees();
+
+                employees =
+                        employeeService.getAllEmployees();
+
             }
 
             model.addAttribute(
@@ -321,63 +395,147 @@ public class EmployeeController {
             }
         }
 
+        //interview card created or not logic for employee table on /employees
+        Map<Long, Boolean> cardStatus =
+                new HashMap<>();
+
+        for (Employee employee : employees) {
+
+            boolean hasCard =
+                    interviewCardRepository
+                            .findByEmployeeIdAndOwnerId(
+                                    employee.getId(),
+                                    user.getId()
+                            )
+                            .isPresent();
+
+            cardStatus.put(
+                    employee.getId(),
+                    hasCard
+            );
+        }
+
+        model.addAttribute(
+                "cardStatus",
+                cardStatus
+        );
         model.addAttribute("employees", employees);
         model.addAttribute("selectedStatus", status);
         model.addAttribute("isAdmin", isAdmin);
-
+        model.addAttribute("selectedTeamId", teamId);
         return "employees";
     }
-
+    //deletion logic includes deletion details in audit log
+    //
     @PostMapping("/employees/delete")
     public String deleteEmployee(
             @RequestParam Long id,
-            Authentication authentication
+            @RequestParam String confirmName,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes
     ) {
 
         Employee employee =
                 employeeService.getEmployeeById(id);
 
+        if (!employee.getName().equals(confirmName)) {
+
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    "社員名が一致しません"
+            );
+
+            return "redirect:/employees/" + id;
+        }
+
         User user = userRepository
                 .findByUsername(authentication.getName())
                 .orElseThrow();
+
+        if (user.getRole() == Role.ADMIN) {
+
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    "管理者は社員を削除できません"
+            );
+
+            return "redirect:/employees";
+        }
         String details =
                 "Name=" + employee.getName()
                         + ", Status=" + employee.getStatus()
                         + ", Date=" + employee.getInterviewDate()
-                        + ", Time=" + employee.getInterviewTime();
+                        + ", Time=" + employee.getInterviewTime() + ", DeletedBy="
+                        + user.getUsername();
 
-        InterviewCard card =
+        List<InterviewCard> cards =
                 interviewCardRepository
-                        .findByEmployeeId(id)
-                        .orElse(null);
+                        .findAllByEmployeeId(id);
 
-        if (card != null) {
+        //logs interview card answers upon deletion
+        //safeguards against accidental loss of interview records
+        if (!cards.isEmpty()) {
 
-            details +=
-                    " | InterviewCard Exists";
+            details += " | CardCount=" + cards.size();
 
-            if (card.getImpressions() != null) {
+            for (InterviewCard card : cards) {
 
                 details +=
-                        " | Impressions="
-                                + card.getImpressions();
-            }
-            if (card.getAnswer1() != null && !card.getAnswer1().isBlank()) {
-                details += " | Q1 Answer=" + card.getAnswer1();
-            }
-            if (card.getAnswer2() != null && !card.getAnswer2().isBlank()) {
-                details += " | Q2 Answer=" + card.getAnswer2();
-            }
-            if (card.getAnswer3() != null && !card.getAnswer3().isBlank()) {
-                details += " | Q3 Answer=" + card.getAnswer3();
-            }
-            if (card.getAnswer4() != null && !card.getAnswer4().isBlank()) {
-                details += " | Q4 Answer=" + card.getAnswer4();
-            }
-            if (card.getAnswer5() != null && !card.getAnswer5().isBlank()) {
-                details += " | Q5 Answer=" + card.getAnswer5();
+                        " | [Owner="
+                                + card.getOwner().getUsername();
+
+                if (card.getImpressions() != null
+                        && !card.getImpressions().isBlank()) {
+
+                    details +=
+                            ", Impressions="
+                                    + card.getImpressions();
+                }
+
+                if (card.getAnswer1() != null
+                        && !card.getAnswer1().isBlank()) {
+
+                    details +=
+                            ", A1="
+                                    + card.getAnswer1();
+                }
+
+                if (card.getAnswer2() != null
+                        && !card.getAnswer2().isBlank()) {
+
+                    details +=
+                            ", A2="
+                                    + card.getAnswer2();
+                }
+
+                if (card.getAnswer3() != null
+                        && !card.getAnswer3().isBlank()) {
+
+                    details +=
+                            ", A3="
+                                    + card.getAnswer3();
+                }
+
+                if (card.getAnswer4() != null
+                        && !card.getAnswer4().isBlank()) {
+
+                    details +=
+                            ", A4="
+                                    + card.getAnswer4();
+                }
+
+                if (card.getAnswer5() != null
+                        && !card.getAnswer5().isBlank()) {
+
+                    details +=
+                            ", A5="
+                                    + card.getAnswer5();
+                }
+
+                details += "]";
             }
         }
+
         auditLogService.log(
                 user.getUsername(),
                 user.getTeam().getName(),
@@ -385,6 +543,11 @@ public class EmployeeController {
                 details
         );
         employeeService.deleteEmployee(id);
+
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                "社員を削除しました"
+        );
 
         return "redirect:/employees";
     }

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>インタビュースケジュール</title>
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="container">
+
+    <h1 class="page-title">
+        チームのインタビュースケジュール
+    </h1>
+
+    <div class="section-card">
+
+        <form method="get"
+              style="display:flex;
+                 gap:10px;
+                 align-items:center;">
+
+            <input
+                    type="date"
+                    name="date"
+                    th:value="${selectedDate}"
+                    style="max-width:220px;" />
+
+            <button
+                    type="submit"
+                    class="logout-btn">
+
+                日付変更
+
+            </button>
+
+        </form>
+
+    </div>
+
+    <div class="team-dashboard-grid">
+
+        <div class="team-dashboard-card"
+             th:each="entry : ${groupedSchedules}">
+
+            <h3 th:text="${entry.key}">
+                Team Name
+            </h3>
+
+            <div th:each="employee : ${entry.value}"
+                 class="team-stat-row">
+
+            <span
+                    th:text="${employee.name}">
+            </span>
+
+                <strong
+                        th:text="${employee.interviewTime}">
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+</body>
+</html>

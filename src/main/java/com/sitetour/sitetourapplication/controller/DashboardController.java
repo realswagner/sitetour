@@ -1,9 +1,11 @@
 package com.sitetour.sitetourapplication.controller;
 
 import com.sitetour.sitetourapplication.dto.DashboardStats;
+import com.sitetour.sitetourapplication.entity.AuditLog;
 import com.sitetour.sitetourapplication.entity.Employee;
 import com.sitetour.sitetourapplication.entity.User;
 import com.sitetour.sitetourapplication.enums.InterviewStatus;
+import com.sitetour.sitetourapplication.repository.AuditLogRepository;
 import com.sitetour.sitetourapplication.repository.UserRepository;
 import com.sitetour.sitetourapplication.service.EmployeeService;
 import com.sitetour.sitetourapplication.service.TeamService;
@@ -32,14 +34,16 @@ public class DashboardController {
     private final EmployeeService employeeService;
     private final TeamService teamService;
     private final UserRepository userRepository;;
+    private final AuditLogRepository auditLogRepository;
 
 
-    public DashboardController(EmployeeService employeeService, TeamService teamService, UserRepository userRepository) {
+    public DashboardController(EmployeeService employeeService, TeamService teamService, UserRepository userRepository, AuditLogRepository auditLogRepository) {
 
         this.employeeService = employeeService;
         this.teamService = teamService;
         this.userRepository = userRepository;
 
+        this.auditLogRepository = auditLogRepository;
     }
 
     @GetMapping("/")
@@ -47,6 +51,7 @@ public class DashboardController {
         return "redirect:/dashboard";
     }
 
+    //admin + user view
     @GetMapping("/dashboard")
     public String dashboard(
             @RequestParam(required = false) Long teamId,
@@ -62,7 +67,7 @@ public class DashboardController {
                 userRepository
                         .findByUsername(auth.getName())
                         .orElseThrow();
-
+        //if admin, dashboard layout changes
         boolean isAdmin =
                 auth.getAuthorities()
                         .stream()
@@ -90,6 +95,21 @@ public class DashboardController {
 
         model.addAttribute("username", auth.getName());
         model.addAttribute("isAdmin", isAdmin);
+
+        //user dashboard audit log widget logic
+        if (!isAdmin) {
+
+            model.addAttribute(
+                    "recentLogs",
+                    auditLogRepository
+                            .findByTeamNameOrderByTimestampDesc(
+                                    user.getTeam().getName()
+                            )
+                            .stream()
+                            .limit(5)
+                            .toList()
+            );
+        }
 
         model.addAttribute("stats", stats);
         //different dashboard display depending on user
@@ -138,6 +158,10 @@ public class DashboardController {
 
         boolean isAdmin =
                 user.getRole().name().equals("ADMIN");
+        if (isAdmin) {
+
+            return "redirect:/admin/schedules";
+        }
 
         List<Employee> employees;
 
@@ -164,11 +188,41 @@ public class DashboardController {
                         ));
 
         model.addAttribute(
+                "isAdmin",
+                isAdmin
+        );
+
+        model.addAttribute(
                 "groupedSchedules",
                 groupedSchedules
         );
 
         return "schedule";
+    }
+
+    //user audit log view
+    @GetMapping("/auditlogs")
+    public String userAuditLogs(
+            Authentication authentication,
+            Model model
+    ) {
+
+        User user =
+                userRepository
+                        .findByUsername(
+                                authentication.getName()
+                        )
+                        .orElseThrow();
+
+        List<AuditLog> logs =
+                auditLogRepository
+                        .findByTeamNameOrderByTimestampDesc(
+                                user.getTeam().getName()
+                        );
+
+        model.addAttribute("logs", logs);
+
+        return "user-auditlogs";
     }
 
     @Autowired

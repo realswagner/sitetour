@@ -9,7 +9,17 @@
 
 <body>
 
+
 <div th:replace="~{fragments/navbar :: navbar}"></div>
+<div th:if="${errorMessage}"
+     class="error-banner"
+     th:text="${errorMessage}">
+</div>
+
+<div th:if="${successMessage}"
+     class="success-banner"
+     th:text="${successMessage}">
+</div>
 
 <div class="container">
 
@@ -28,7 +38,8 @@
                     <option
                             th:each="team : ${teams}"
                             th:value="${team.id}"
-                            th:text="${team.name}">
+                            th:text="${team.name}"
+                            th:selected="${team.id == selectedTeamId}">
                     </option>
 
                 </select>
@@ -39,11 +50,30 @@
 
                     <option value="">全ステータス</option>
 
-                    <option value="NOT_CONTACTED">未連絡</option>
-                    <option value="CONTACTING">連絡中</option>
-                    <option value="AWAITING_REPLY">返信待ち</option>
-                    <option value="SCHEDULED">予定確定</option>
-                    <option value="COMPLETED">完了</option>
+                    <option value="NOT_CONTACTED"
+                            th:selected="${selectedStatus?.name() == 'NOT_CONTACTED'}">
+                        未連絡
+                    </option>
+
+                    <option value="CONTACTING"
+                            th:selected="${selectedStatus?.name() == 'CONTACTING'}">
+                        連絡中
+                    </option>
+
+                    <option value="AWAITING_REPLY"
+                            th:selected="${selectedStatus?.name() == 'AWAITING_REPLY'}">
+                        返信待ち
+                    </option>
+
+                    <option value="SCHEDULED"
+                            th:selected="${selectedStatus?.name() == 'SCHEDULED'}">
+                        予定確定
+                    </option>
+
+                    <option value="COMPLETED"
+                            th:selected="${selectedStatus?.name() == 'COMPLETED'}">
+                        完了
+                    </option>
 
                 </select>
 
@@ -95,6 +125,16 @@
 
                 <td>
 
+                    <span th:if="${cardStatus[employee.id]}"
+                          class="card-created"
+                          title="パーソナルレポート作成済み">
+                    </span>
+
+                    <span th:unless="${cardStatus[employee.id]}"
+                          class="card-not-created"
+                          title="パーソナルレポート未作成">
+                    </span>
+
                     <a th:href="@{'/employees/' + ${employee.id}}"
                        th:text="${employee.name}"
                        class="employee-link">
@@ -135,6 +175,21 @@
             </tbody>
 
         </table>
+        <div style="
+    margin-top:15px;
+    color:#666;
+    font-size:0.9rem;
+">
+
+            <span class="card-not-created"></span>
+            未作成
+
+            <span style="margin-left:20px;"></span>
+
+            <span class="card-created"></span>
+            作成済み
+
+        </div>
 
     </div>
 

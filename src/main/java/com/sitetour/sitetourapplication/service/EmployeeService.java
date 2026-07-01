@@ -28,19 +28,22 @@ public class EmployeeService {
     private final EmployeeRepository employeeRepository;
     private final TeamRepository teamRepository;
     private final InterviewCardRepository interviewCardRepository;
+    private final InterviewCardService interviewCardService;
 
     public EmployeeService(
             EmployeeRepository employeeRepository,
             TeamRepository teamRepository,
-            InterviewCardRepository interviewCardRepository) {
+            InterviewCardRepository interviewCardRepository,
+            InterviewCardService interviewCardService) {
 
         this.employeeRepository = employeeRepository;
         this.teamRepository = teamRepository;
         this.interviewCardRepository = interviewCardRepository;
+        this.interviewCardService = interviewCardService;
     }
 
     //create employee entity function
-    public void createEmployee(
+    public Employee createEmployee(
             String name,
             String email,
             String phoneNumber,
@@ -73,12 +76,12 @@ public class EmployeeService {
         employee.setZoomLink(zoomLink);
         employee.setTeam(team);
 
-        employeeRepository.save(employee);
 
-        InterviewCard card = new InterviewCard();
-        card.setEmployee(employee);
+        Employee savedEmployee =
+                employeeRepository.save(employee);
 
-        interviewCardRepository.save(card);
+        return savedEmployee;
+
     }
 
     //method to display employee list
@@ -138,7 +141,7 @@ public class EmployeeService {
         employee.setZoomLink(zoomLink);
 
         employeeRepository.save(employee);
-
+        //name REQUIRED for employee creation
         if (name == null || name.trim().isEmpty()) {
             throw new RuntimeException("Name is required");
         }
@@ -230,6 +233,30 @@ public class EmployeeService {
                                 InterviewStatus.COMPLETED
                         )
                 );
+    }
+
+    //method for retrieving team schedules for admin-schedules view
+    public List<Employee> getScheduledEmployeesByDate(
+            LocalDate date
+    ) {
+
+        return employeeRepository
+                .findByStatusInOrderByInterviewDateAscInterviewTimeAsc(
+                        List.of(
+                                InterviewStatus.SCHEDULED,
+                                InterviewStatus.COMPLETED
+                        )
+                )
+                .stream()
+                .filter(employee ->
+
+                        employee.getInterviewDate() != null
+
+                                && employee.getInterviewDate()
+                                .equals(date)
+
+                )
+                .toList();
     }
 
 

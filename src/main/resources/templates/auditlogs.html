@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>監査ログ</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="container">
+
+    <h1 class="page-title">
+        監査ログ
+    </h1>
+
+<div class="section-card">
+
+    <form method="get"
+          action="/admin/auditlogs"
+          style="display:flex;
+                 gap:10px;
+                 align-items:center;">
+
+        <select name="team"
+                style="max-width:220px;">
+
+            <option value="ALL"
+                    th:selected="${selectedTeam == null or selectedTeam == 'ALL'}">
+                全チーム
+            </option>
+            <option value="SYSTEM">
+                SYSTEM
+            </option>
+
+            <option th:each="teamName : ${teams}"
+                    th:value="${teamName}"
+                    th:text="${teamName}"
+                    th:selected="${selectedTeam == teamName}">
+            </option>
+
+        </select>
+
+        <button
+                type="submit"
+                class="logout-btn">
+
+            フィルター
+
+        </button>
+
+    </form>
+
+</div>
+
+<br>
+
+<div style="
+        max-height:700px;
+        overflow-y:auto;
+        border:1px solid #ccc;
+">
+
+    <table
+            style="
+        width:100%;
+        border-collapse:collapse;
+        table-layout:fixed;
+">
+
+        <thead>
+
+        <tr>
+
+            <th style="width:170px;">Time</th>
+            <th style="width:120px;">User</th>
+            <th style="width:180px;">Team</th>
+            <th style="width:230px;">Action</th>
+            <th>Details</th>
+
+        </tr>
+
+        </thead>
+
+        <tbody>
+
+        <tr th:each="log : ${logs}">
+
+            <td th:text="${#temporals.format(
+                          log.timestamp,
+                           'yyyy/MM/dd HH:mm:ss')}">
+            </td>
+
+            <td th:text="${log.username}">
+            </td>
+
+            <td th:text="${log.teamName}">
+            </td>
+
+            <td th:text="${log.action}">
+            </td>
+
+            <td
+                    style="
+        white-space:pre-wrap;
+        word-break:break-word;
+        line-height:1.4;
+    "
+                    th:text="${log.details}">
+            </td>
+
+        </tr>
+
+        </tbody>
+
+    </table>
+
+</div>
+</div>
+</body>
+
+</html>

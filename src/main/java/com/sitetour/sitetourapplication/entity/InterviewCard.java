@@ -2,18 +2,41 @@ package com.sitetour.sitetourapplication.entity;
 
 import jakarta.persistence.*;
 
-
 @Entity
+@Table(name = "interview_card")
 public class InterviewCard {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Link back to employee (core relationship)
-    @OneToOne
+    public User getOwner() {
+        return owner;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = owner;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Employee getEmployee() {
+        return employee;
+    }
+
+    public void setEmployee(Employee employee) {
+        this.employee = employee;
+    }
+
+    @ManyToOne
     @JoinColumn(name = "employee_id")
     private Employee employee;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User owner;
 
 
     public String getQuestion1() {
@@ -107,30 +130,30 @@ public class InterviewCard {
     // Future: Q&A + impressions (leave empty for now)
     private String question1;
 
-    @Column(length = 2000)
+    @Column(columnDefinition = "TEXT")
     private String answer1;
 
     private String question2;
 
-    @Column(length = 2000)
+    @Column(columnDefinition = "TEXT")
     private String answer2;
 
     private String question3;
 
-    @Column(length = 2000)
+    @Column(columnDefinition = "TEXT")
     private String answer3;
 
     private String question4;
 
-    @Column(length = 2000)
+    @Column(columnDefinition = "TEXT")
     private String answer4;
 
     private String question5;
 
-    @Column(length = 2000)
+    @Column(columnDefinition = "TEXT")
     private String answer5;
 
-    @Column(length = 3000)
+    @Column(columnDefinition = "TEXT")
     private String impressions;
 
     // Constructors
@@ -145,11 +168,5 @@ public class InterviewCard {
         return id;
     }
 
-    public Employee getEmployee() {
-        return employee;
-    }
 
-    public void setEmployee(Employee employee) {
-        this.employee = employee;
-    }
 }

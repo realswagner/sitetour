@@ -9,12 +9,32 @@
 <body>
 <div th:replace="~{fragments/navbar :: navbar}"></div>
 <div class="container">
+    <div th:if="${errorMessage}"
+         class="error-banner"
+         th:text="${errorMessage}">
+    </div>
+
+    <div th:if="${successMessage}"
+         class="success-banner"
+         th:text="${successMessage}">
+    </div>
 
     <h1 class="page-title">社員詳細</h1>
 
     <div class="section-card">
 
         <h2 th:text="${employee.name}"></h2>
+        <div style="margin-bottom:20px;">
+
+            <a th:unless="${isAdmin}"
+               th:href="@{'/employees/' + ${employee.id} + '/edit'}"
+               class="action-btn">
+
+                編集
+
+            </a>
+
+        </div>
 
         <p><strong>メール:</strong>
             <span th:text="${employee.email}"></span>
@@ -30,7 +50,7 @@
         <p>
             <strong>ステータス:</strong>
 
-            <span th:switch="${employee.status}">
+            <span th:switch="${employee.status.name()}">
 
                 <span th:case="'NOT_CONTACTED'">未連絡</span>
                 <span th:case="'CONTACTING'">連絡中</span>
@@ -49,7 +69,7 @@
         <h2>インタビュー情報</h2>
 
         <p>
-            <strong>候補日：</strong>
+            <strong>候補日 / メモ：</strong>
             <span th:text="${employee.proposedDates}"></span>
         </p>
 
@@ -128,9 +148,30 @@
 
     <div class="section-card">
 
-        <h2>パーソナルレポート</h2>
+        <div style="
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+">
+
+            <h2 style="margin:0;">
+                パーソナルレポート
+            </h2>
+
+            <button type="button"
+                    id="report-btn"
+                    class="logout-btn toggle-btn"
+                    onclick="toggleReport()">
+
+                開く
+
+            </button>
+
+        </div>
 
         <div th:if="${card != null}">
+            <div id="report-content"
+                 style="display:none;">
 
             <div class="report-block">
 
@@ -264,7 +305,7 @@
             </div>
 
         </div>
-
+        </div>
         <div class="action-buttons"
              th:if="${card != null}">
 
@@ -279,47 +320,93 @@
 
     </div>
 
-    <div style="display:flex; gap:15px;">
+    <div class="action-buttons">
 
-        <div class="action-buttons">
+        <a href="/employees"
+           class="action-btn-secondary">
 
-            <a href="/employees" class="action-btn-secondary">
-                ← 一覧へ戻る
-            </a>
+            ← 一覧へ戻る
 
-            <a th:unless="${isAdmin}"
-               th:href="@{'/employees/' + ${employee.id} + '/edit'}"
-               class="action-btn">
-                編集
-            </a>
-            <form th:action="@{/employees/delete}"
-                  method="post"
-                  onsubmit="return confirm('削除しますか？');">
+        </a>
 
-                <input type="hidden"
-                       th:name="${_csrf.parameterName}"
-                       th:value="${_csrf.token}" />
+    </div>
 
-                <input type="hidden"
-                       name="id"
-                       th:value="${employee.id}" />
+    <div class="section-card">
 
-                <button type="submit"
-                        class="logout-btn">
+        <h3 style="color:#d9534f;">
+            社員削除
+        </h3>
 
-                    削除
+        <form th:action="@{/employees/delete}"
+              method="post"
+              onsubmit="return confirm('削除しますか？');">
 
-                </button>
+            <input type="hidden"
+                   th:name="${_csrf.parameterName}"
+                   th:value="${_csrf.token}" />
+
+            <input type="hidden"
+                   name="id"
+                   th:value="${employee.id}" />
+
+            <div class="form-group">
+
+                <label>
+
+                    削除するには社員名を入力してください
+
+                </label>
+
                 <input type="text"
                        name="confirmName"
-                       placeholder="氏名を入力">
+                       th:placeholder="${employee.name}"
+                       required>
 
-            </form>
+            </div>
 
-        </div>
+            <button type="submit"
+                    class="logout-btn"
+                    style="background:#d9534f;">
+
+                削除
+
+            </button>
+
+        </form>
 
     </div>
 
 </div>
+<script>
+function toggleReport() {
+
+const report =
+document.getElementById("report-content");
+
+const button =
+document.getElementById("report-btn");
+
+const opening =
+report.style.display === "none"
+|| report.style.display === "";
+
+if (opening) {
+
+report.style.display = "block";
+
+button.classList.add("active");
+
+button.textContent = "閉じる";
+
+} else {
+
+report.style.display = "none";
+
+button.classList.remove("active");
+
+button.textContent = "開く";
+}
+}
+</script>
 </body>
 </html>

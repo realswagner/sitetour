@@ -1,5 +1,6 @@
 package com.sitetour.sitetourapplication.controller;
 import com.sitetour.sitetourapplication.entity.Team;
+import com.sitetour.sitetourapplication.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,14 +17,17 @@ public class TeamController {
 
     private final EmployeeService employeeService;
     private final TeamService teamService;
+    private final UserService userService;
 
     public TeamController(
             TeamService teamService,
-            EmployeeService employeeService
+            EmployeeService employeeService,
+            UserService userService
     ) {
 
         this.teamService = teamService;
         this.employeeService = employeeService;
+        this.userService = userService;
     }
 
     @GetMapping("/teams/{id}")
@@ -45,4 +49,6 @@ public class TeamController {
 
         return "team_detail";
     }
+
+
 }

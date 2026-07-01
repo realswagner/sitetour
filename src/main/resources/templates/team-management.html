@@ -1,0 +1,535 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>チーム管理</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"> </head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+ <!-- this div is universal change tracker when updates are made to team/user -->
+<div th:if="${successMessage}"
+     class="success-banner">
+
+    <span th:text="${successMessage}"></span>
+
+</div>
+
+<div th:if="${errorMessage}"
+     class="error-banner">
+
+    <span th:text="${errorMessage}"></span>
+
+</div>
+
+<div class="container">
+
+    <h1 class="page-title">
+        チーム管理
+    </h1>
+    <!-- error alert -->
+    <div th:if="${param.error}"
+         style="color:red; margin-bottom:15px;">
+
+        パスワードが一致しません
+
+    </div>
+    <!-- password reset success message-->
+    <div th:if="${param.success}"
+         style="color:green; margin-bottom:15px;">
+
+        パスワードを変更しました
+
+    </div>
+
+    <div class="section-card">
+
+        <h2>チーム作成</h2>
+
+        <button type="button"
+                class="logout-btn toggle-btn"
+                onclick="toggleCreateTeam()">
+
+            ＋ 新規チーム作成
+
+        </button>
+
+        <div id="createTeamPanel"
+             style="display:none; margin-top:20px;">
+
+            <form action="/admin/teams/create" method="post">
+
+                <input type="hidden"
+                       th:name="${_csrf.parameterName}"
+                       th:value="${_csrf.token}" />
+
+                <div class="form-group">
+                    <label>チーム名</label>
+                    <input type="text"
+                           name="teamName"
+                           required>
+                </div>
+
+                <div class="form-group">
+                    <label>ログインID</label>
+                    <input type="text"
+                           name="username"
+                           required>
+                </div>
+
+                <div class="form-group">
+                    <label>パスワード</label>
+                    <input type="password"
+                           name="password"
+                           required>
+                </div>
+
+                <div class="form-group">
+                    <label>パスワード確認</label>
+                    <input type="password"
+                           name="confirmPassword"
+                           required>
+                </div>
+
+                <button type="submit"
+                        class="logout-btn">
+
+                    作成
+
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <div class="team-dashboard-grid">
+
+        <div th:each="team : ${teams}"
+             class="team-dashboard-card">
+
+            <h3 th:text="${team.name}">
+                Team Name
+            </h3>
+
+            <p style="color:#777;">
+                Team ID:
+                <span th:text="${team.id}"></span>
+            </p>
+
+            <div style="display:flex; flex-direction:column; gap:10px; margin-top:15px;">
+
+                <button
+                        type="button"
+                        class="logout-btn toggle-btn"
+                        th:id="|users-btn-${team.id}|"
+                        th:onclick="|toggleSection(${team.id}, 'users')|">
+
+                    ユーザー管理
+
+                </button>
+
+                <button
+                        type="button"
+                        class="logout-btn toggle-btn"
+                        th:id="|notes-btn-${team.id}|"
+                        th:onclick="|toggleSection(${team.id}, 'notes')|">
+
+                    メモ管理
+
+                </button>
+
+                <button
+                        type="button"
+                        class="logout-btn toggle-btn"
+                        th:id="|settings-btn-${team.id}|"
+                        th:onclick="|toggleSection(${team.id}, 'settings')|">
+
+                    チーム設定
+
+                </button>
+
+            </div>
+
+            <!-- USERS -->
+
+            <div th:id="'users-' + ${team.id}"
+                 style="display:none; margin-top:20px;">
+
+                <h4>ユーザー一覧</h4>
+
+                <div th:each="user : ${teamUsers[team.id]}"
+                     style="padding:10px 0; border-bottom:1px solid #eee;">
+
+                    <strong th:text="${user.username}">
+                    </strong>
+
+                    <div style="margin-top:10px;">
+
+                        <form action="/admin/users/delete"
+                              method="post"
+                              onsubmit="return confirmUserDelete(this);"
+                              th:attr="data-username=${user.username}">
+
+                            <input type="hidden"
+                                   th:name="${_csrf.parameterName}"
+                                   th:value="${_csrf.token}" />
+
+                            <input type="hidden"
+                                   name="userId"
+                                   th:value="${user.id}" />
+
+                            <button type="submit"
+                                    class="logout-btn"
+                                    style="background:#d9534f;">
+
+                                ユーザー削除
+
+                            </button>
+
+                        </form>
+
+                        <br>
+
+                        <button type="button"
+                                class="logout-btn"
+                                th:onclick="|togglePasswordReset(${user.id})|">
+
+                            パスワード変更
+
+                        </button>
+
+                        <div th:id="'password-' + ${user.id}"
+                             style="display:none; margin-top:10px;">
+
+                            <form action="/admin/users/reset-password"
+                                  method="post">
+
+                                <input type="hidden"
+                                       th:name="${_csrf.parameterName}"
+                                       th:value="${_csrf.token}" />
+
+                                <input type="hidden"
+                                       name="userId"
+                                       th:value="${user.id}" />
+                                <div th:id="'password-' + ${user.id}"
+                                     th:style="${param.error} ? 'display:block; margin-top:10px;' : 'display:none; margin-top:10px;'">
+                                </div>
+
+                                <input type="password"
+                                       name="password"
+                                       placeholder="新しいパスワード"
+                                       required>
+
+                                <input type="password"
+                                       name="confirmPassword"
+                                       placeholder="確認"
+                                       required>
+
+                                <button type="submit"
+                                        class="logout-btn">
+
+                                    保存
+
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <hr>
+
+                <h4>ユーザー追加</h4>
+
+                <form action="/admin/teams/add-user"
+                      method="post">
+
+                    <input type="hidden"
+                           th:name="${_csrf.parameterName}"
+                           th:value="${_csrf.token}" />
+
+                    <input type="hidden"
+                           name="teamId"
+                           th:value="${team.id}" />
+
+                    <div class="form-group">
+
+                        <input type="text"
+                               name="username"
+                               placeholder="ログインID"
+                               required>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <input type="password"
+                               name="password"
+                               placeholder="パスワード"
+                               required>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <input type="password"
+                               name="confirmPassword"
+                               placeholder="確認"
+                               required>
+
+                    </div>
+
+                    <button type="submit"
+                            class="logout-btn">
+
+                        ユーザー追加
+
+                    </button>
+
+                </form>
+
+            </div>
+
+            <!-- NOTES -->
+
+            <div th:id="'notes-' + ${team.id}"
+                 style="display:none; margin-top:20px;">
+
+                <h4>チームメモ</h4>
+
+                <form action="/admin/teams/update-notes"
+                      method="post">
+
+                    <input type="hidden"
+                           th:name="${_csrf.parameterName}"
+                           th:value="${_csrf.token}" />
+
+                    <input type="hidden"
+                           name="teamId"
+                           th:value="${team.id}" />
+
+                    <textarea name="memberNotes"
+                              rows="6"
+                              th:text="${team.memberNotes}">
+                </textarea>
+
+                    <br><br>
+
+                    <button type="submit"
+                            class="logout-btn">
+
+                        メモ保存
+
+                    </button>
+
+                </form>
+
+            </div>
+
+            <!-- SETTINGS -->
+
+            <div th:id="'settings-' + ${team.id}"
+                 style="display:none; margin-top:20px;">
+
+                <h4>チーム名変更</h4>
+
+                <form action="/admin/teams/rename"
+                      method="post">
+
+                    <input type="hidden"
+                           th:name="${_csrf.parameterName}"
+                           th:value="${_csrf.token}" />
+
+                    <input type="hidden"
+                           name="teamId"
+                           th:value="${team.id}" />
+
+                    <input type="text"
+                           name="teamName"
+                           th:value="${team.name}"
+                           required>
+
+                    <br><br>
+
+                    <button type="submit"
+                            class="logout-btn">
+
+                        名前変更
+
+                    </button>
+
+                </form>
+
+                <hr>
+
+                <h4 style="color:#d9534f;">
+                    チーム削除
+                </h4>
+
+                <form action="/admin/teams/delete"
+                      method="post"
+                      onsubmit="return confirmDelete(this);"
+                      th:attr="data-team-name=${team.name}">
+
+                    <input type="hidden"
+                           th:name="${_csrf.parameterName}"
+                           th:value="${_csrf.token}" />
+
+                    <input type="hidden"
+                           name="teamId"
+                           th:value="${team.id}" />
+
+                    <input type="text"
+                           name="confirmName"
+                           placeholder="チーム名を入力"
+                           required>
+
+                    <br><br>
+
+                    <button type="submit"
+                            class="logout-btn"
+                            style="background:#d9534f;">
+
+                        チーム削除
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+<script>
+    window.onload = function() {
+
+        const params =
+            new URLSearchParams(window.location.search);
+
+        const teamId =
+            params.get("teamId");
+
+        const section =
+            params.get("section");
+
+        if (teamId && section) {
+
+            toggleSection(teamId, section);
+        }
+
+    }
+    function confirmDelete(form) {
+
+        const teamName =
+            form.dataset.teamName;
+
+        const entered =
+            form.confirmName.value;
+
+        if (entered !== teamName) {
+
+            alert("チーム名が一致しません");
+
+            return false;
+        }
+
+        return confirm(
+            teamName + " を本当に削除しますか？"
+        );
+    }
+
+    function confirmUserDelete(form) {
+
+        const username =
+            form.dataset.username;
+
+        if (!confirm(
+            username + " を削除しますか？"
+        )) {
+            return false;
+        }
+
+        return confirm(
+            "本当に削除しますか？"
+        );
+    }
+
+    function toggleCreateTeam() {
+
+        const panel =
+            document.getElementById("createTeamPanel");
+
+        panel.style.display =
+            panel.style.display === "none"
+                ? "block"
+                : "none";
+    }
+
+    //js function to toggle team settings - toggles are exclusive, toggling one on untoggles previous if toggled
+    function toggleSection(teamId, section) {
+
+        const sections = ["users", "notes", "settings"];
+
+        sections.forEach(s => {
+
+            const panel =
+                document.getElementById(s + "-" + teamId);
+
+            const button =
+                document.getElementById(s + "-btn-" + teamId);
+
+            if (!panel || !button) {
+                return;
+            }
+
+            if (s === section) {
+
+                const opening =
+                    panel.style.display === "none"
+                    || panel.style.display === "";
+
+                if (opening) {
+
+                    panel.style.display = "block";
+                    button.classList.add("active");
+
+                } else {
+
+                    panel.style.display = "none";
+                    button.classList.remove("active");
+                }
+
+            } else {
+
+                panel.style.display = "none";
+                button.classList.remove("active");
+            }
+
+        });
+
+    }
+
+    function togglePasswordReset(userId) {
+
+        const target =
+            document.getElementById(
+                "password-" + userId
+            );
+
+        target.style.display =
+            target.style.display === "none"
+                ? "block"
+                : "none";
+    }
+
+</script>
+</body>
+</html>
