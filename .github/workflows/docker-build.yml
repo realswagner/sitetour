@@ -63,6 +63,7 @@ jobs:
               \"echo $COMPOSE_CONTENT | base64 -d > /home/ubuntu/deploy/docker-compose.yml\",
               \"echo $DEPLOY_SCRIPT_CONTENT | base64 -d > /home/ubuntu/deploy/deploy.sh\",
               \"chmod +x /home/ubuntu/deploy/deploy.sh\",
+              \"chown -R ubuntu:ubuntu /home/ubuntu/deploy",
               \"bash /home/ubuntu/deploy/deploy.sh\"
             ]" \
             --query "Command.CommandId" \
