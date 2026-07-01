@@ -52,14 +52,19 @@ jobs:
 
       - name: Deploy via SSM
         run: |
+          COMPOSE_CONTENT=$(base64 -w 0 deploy/docker-compose.yml)
+
           COMMAND_ID=$(aws ssm send-command \
             --instance-ids "i-04866771c489ae4a6" \
             --document-name "AWS-RunShellScript" \
-            --parameters commands='[
-              "cd /home/ubuntu/deploy",
-              "docker compose pull",
-              "docker compose up -d"
-            ]' \
+            --parameters commands="[
+              \"mkdir -p /home/ubuntu/deploy\",
+              \"echo $COMPOSE_CONTENT | base64 -d > /home/ubuntu/deploy/docker-compose.yml\",
+              \"cd /home/ubuntu/deploy\",
+              \"docker compose pull\",
+              \"docker compose up -d\",
+              \"docker ps\"
+            ]" \
             --query "Command.CommandId" \
             --output text)
 
