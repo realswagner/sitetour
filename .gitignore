@@ -70,3 +70,6 @@ terraform.rc
 # Lock file
 # KEEP THIS if working in a team
 # .terraform.lock.hcl
+
+#env
+.env
