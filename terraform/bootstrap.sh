@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -e
-
+usermod -aG docker ubuntu
 echo "===== udpating Ubuntu ====="
 
 apt-get update
@@ -32,7 +32,6 @@ https://download.docker.com/linux/ubuntu \
 $(. /etc/os-release && echo "$VERSION_CODENAME") stable" \
 | tee /etc/apt/sources.list.d/docker.list > /dev/null
 
-apt-get update
 
 apt-get install -y \
 docker-ce \
@@ -45,9 +44,11 @@ systemctl enable docker
 systemctl start docker
 
 apt-get update -y
-apt-get install -y git
 
-mkdir -p /home/ubuntu/sitetour
-chown -R ubuntu:ubuntu /home/ubuntu/sitetour
+
+
+mkdir -p /home/ubuntu/deploy
+
+chown -R ubuntu:ubuntu /home/ubuntu/deploy
 echo "===== Bootstrap Complete ====="
 
