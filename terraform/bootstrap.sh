@@ -44,4 +44,10 @@ docker-compose-plugin
 systemctl enable docker
 systemctl start docker
 
+apt-get update -y
+apt-get install -y git
+
+mkdir -p /home/ubuntu/sitetour
+chown -R ubuntu:ubuntu /home/ubuntu/sitetour
 echo "===== Bootstrap Complete ====="
+
