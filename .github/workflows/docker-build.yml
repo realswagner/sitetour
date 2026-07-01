@@ -64,6 +64,7 @@ jobs:
               \"echo $DEPLOY_SCRIPT_CONTENT | base64 -d > /home/ubuntu/deploy/deploy.sh\",
               \"chmod +x /home/ubuntu/deploy/deploy.sh\",
               \"chown -R ubuntu:ubuntu /home/ubuntu/deploy",
+              \"echo ${{ secrets.GHCR_TOKEN }} | sudo docker login ghcr.io -u realswagner --password-stdin",
               \"bash /home/ubuntu/deploy/deploy.sh\"
             ]" \
             --query "Command.CommandId" \
