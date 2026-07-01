@@ -56,6 +56,8 @@ resource "aws_instance" "sitetour_server" {
 
   tags = {
     Name = "${local.name_prefix} Server"
+    App  = "sitetour"
+    Env  = "dev"
   }
 
 }
