@@ -3,6 +3,6 @@ set -e
 
 cd /home/ubuntu/deploy
 
-docker compose pull
-docker compose up -d
-docker ps
+sudo docker compose pull
+sudo docker compose up -d
+sudo docker ps
