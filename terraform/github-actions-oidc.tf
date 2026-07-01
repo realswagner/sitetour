@@ -50,13 +50,19 @@ resource "aws_iam_role_policy" "github_actions_ssm_deploy_policy" {
       {
         Effect = "Allow"
         Action = [
-          "ssm:SendCommand",
-          "ssm:GetCommandInvocation"
+          "ssm:SendCommand"
         ]
         Resource = [
           aws_instance.sitetour_server.arn,
           "arn:aws:ssm:${var.aws_region}:*:document/AWS-RunShellScript"
         ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "ssm:GetCommandInvocation"
+        ]
+        Resource = "*"
       },
       {
         Effect = "Allow"
