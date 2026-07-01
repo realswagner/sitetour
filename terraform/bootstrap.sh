@@ -1,8 +1,8 @@
 #!/bin/bash
 
 set -e
-usermod -aG docker ubuntu
-echo "===== udpating Ubuntu ====="
+
+echo "===== updating Ubuntu ====="
 
 apt-get update
 apt-get upgrade -y
@@ -32,23 +32,22 @@ https://download.docker.com/linux/ubuntu \
 $(. /etc/os-release && echo "$VERSION_CODENAME") stable" \
 | tee /etc/apt/sources.list.d/docker.list > /dev/null
 
+apt-get update
 
 apt-get install -y \
-docker-ce \
-docker-ce-cli \
-containerd.io \
-docker-buildx-plugin \
-docker-compose-plugin
+    docker-ce \
+    docker-ce-cli \
+    containerd.io \
+    docker-buildx-plugin \
+    docker-compose-plugin
 
 systemctl enable docker
 systemctl start docker
 
-apt-get update -y
-
-
+usermod -aG docker ubuntu
 
 mkdir -p /home/ubuntu/deploy
 
 chown -R ubuntu:ubuntu /home/ubuntu/deploy
-echo "===== Bootstrap Complete ====="
 
+echo "===== Bootstrap Complete ====="

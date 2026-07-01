@@ -15,5 +15,5 @@ output "application_url" {
 
 output "ssh_command" {
   description = "Convenient SSH command"
-  value = "ssh -i C:/Users/USER/.ssh/sitetour ubuntu@${aws_instance.sitetour_server.public_ip}"
+  value       = "ssh -i C:/Users/USER/.ssh/sitetour ubuntu@${aws_instance.sitetour_server.public_ip}"
 }
