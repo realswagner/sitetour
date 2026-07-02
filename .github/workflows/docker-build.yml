@@ -56,6 +56,7 @@ jobs:
         run: |
           COMPOSE_CONTENT=$(base64 -w 0 deploy/docker-compose.yml)
           DEPLOY_SCRIPT_CONTENT=$(base64 -w 0 deploy/deploy.sh)
+          NGINX_CONFIG_CONTENT=$(base64 -w 0 deploy/nginx/default.conf)
           
           INSTANCE_ID=$(aws ec2 describe-instances \
             --filters "Name=tag:App,Values=sitetour" "Name=tag:Env,Values=dev" "Name=instance-state-name,Values=running" \
@@ -69,8 +70,10 @@ jobs:
             --document-name "AWS-RunShellScript" \
             --parameters commands="[
               \"mkdir -p /home/ubuntu/deploy\",
+              \"mkdir -p /home/ubuntu/deploy/nginx\",
               \"echo $COMPOSE_CONTENT | base64 -d > /home/ubuntu/deploy/docker-compose.yml\",
               \"echo $DEPLOY_SCRIPT_CONTENT | base64 -d > /home/ubuntu/deploy/deploy.sh\",
+              \"echo $NGINX_CONFIG_CONTENT | base64 -d > /home/ubuntu/deploy/nginx/default.conf\",
               \"printf '%s\n' 'POSTGRES_DB=${{ secrets.POSTGRES_DB }}' 'POSTGRES_USER=${{ secrets.POSTGRES_USER }}' 'POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}' 'SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }}' 'SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }}' 'SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }}' > /home/ubuntu/deploy/.env\",
               \"chmod +x /home/ubuntu/deploy/deploy.sh\",
               \"chown -R ubuntu:ubuntu /home/ubuntu/deploy\",
