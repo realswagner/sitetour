@@ -23,19 +23,6 @@ resource "aws_security_group" "sitetour_sg" {
 
   }
 
-  ingress {
-
-    description = "Spring Boot"
-
-    from_port = 8080
-
-    to_port = 8080
-
-    protocol = "tcp"
-
-    cidr_blocks = ["0.0.0.0/0"]
-
-  }
   // HTTP for Nginx
   ingress {
     description = "HTTP"
