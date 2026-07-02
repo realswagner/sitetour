@@ -43,7 +43,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
       - uses: actions/checkout@v4
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -54,33 +56,32 @@ jobs:
         run: |
           COMPOSE_CONTENT=$(base64 -w 0 deploy/docker-compose.yml)
           DEPLOY_SCRIPT_CONTENT=$(base64 -w 0 deploy/deploy.sh)
-
+          
+          INSTANCE_ID=$(aws ec2 describe-instances \
+            --filters "Name=tag:App,Values=sitetour" "Name=tag:Env,Values=dev" "Name=instance-state-name,Values=running" \
+            --query "Reservations[0].Instances[0].InstanceId" \
+            --output text)
+          
+          echo "Deploy target instance: $INSTANCE_ID"
+          
           COMMAND_ID=$(aws ssm send-command \
-            --instance-ids "i-04866771c489ae4a6" \
+            --instance-ids "$INSTANCE_ID" \
             --document-name "AWS-RunShellScript" \
             --parameters commands="[
               \"mkdir -p /home/ubuntu/deploy\",
               \"echo $COMPOSE_CONTENT | base64 -d > /home/ubuntu/deploy/docker-compose.yml\",
               \"echo $DEPLOY_SCRIPT_CONTENT | base64 -d > /home/ubuntu/deploy/deploy.sh\",
-               \"cat > /home/ubuntu/deploy/.env <<EOF
-                POSTGRES_DB=${{ secrets.POSTGRES_DB }}
-                POSTGRES_USER=${{ secrets.POSTGRES_USER }}
-                POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
-                SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }}
-                SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }}
-                SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }}
-                EOF\",
+              \"printf '%s\n' 'POSTGRES_DB=${{ secrets.POSTGRES_DB }}' 'POSTGRES_USER=${{ secrets.POSTGRES_USER }}' 'POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}' 'SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }}' 'SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }}' 'SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }}' > /home/ubuntu/deploy/.env\",
               \"chmod +x /home/ubuntu/deploy/deploy.sh\",
-              \"chown -R ubuntu:ubuntu /home/ubuntu/deploy",
-              \"echo ${{ secrets.GHCR_TOKEN }} | sudo docker login ghcr.io -u realswagner --password-stdin",
-              
+              \"chown -R ubuntu:ubuntu /home/ubuntu/deploy\",
+              \"echo '${{ secrets.GHCR_TOKEN }}' | sudo docker login ghcr.io -u realswagner --password-stdin\",
               \"bash /home/ubuntu/deploy/deploy.sh\"
             ]" \
             --query "Command.CommandId" \
             --output text)
-
+          
           echo "SSM Command ID: $COMMAND_ID"
-
+          
           aws ssm get-command-invocation \
             --command-id "$COMMAND_ID" \
-            --instance-id "i-04866771c489ae4a6"
+            --instance-id "$INSTANCE_ID"
