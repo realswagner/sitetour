@@ -36,6 +36,14 @@ resource "aws_security_group" "sitetour_sg" {
     cidr_blocks = ["0.0.0.0/0"]
 
   }
+  // HTTP for Nginx
+  ingress {
+    description = "HTTP"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
   egress {
 
