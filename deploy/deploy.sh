@@ -5,7 +5,9 @@ cd /home/ubuntu/deploy
 
 sudo docker compose pull
 sudo docker compose up -d
-
+# recreate nginx to avoid ip issues 
+echo "Recreating Nginx to refresh Docker DNS..."
+docker compose up -d --force-recreate nginx
 #health check
 echo "Waiting for application health check..."
 
