@@ -69,3 +69,12 @@ resource "aws_key_pair" "sitetour_key" {
   public_key = file("C:/Users/USER/.ssh/sitetour.pub")
 
 }
+
+resource "aws_eip" "sitetour_eip" {
+  instance = aws_instance.sitetour_server.id
+  domain   = "vpc"
+
+  tags = {
+    Name = "${local.name_prefix} EIP"
+  }
+}

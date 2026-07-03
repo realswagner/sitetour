@@ -33,6 +33,7 @@ services:
     ports:
       - "80:80"
     volumes:
+      - /var/www/certbot:/var/www/certbot:ro　
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
 
 volumes:

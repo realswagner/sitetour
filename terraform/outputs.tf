@@ -1,6 +1,6 @@
 output "public_ip" {
   description = "Public IPv4 of the EC2 instance"
-  value       = aws_instance.sitetour_server.public_ip
+  value       = aws_eip.sitetour_eip.public_ip
 }
 
 output "public_dns" {
@@ -10,10 +10,12 @@ output "public_dns" {
 
 output "application_url" {
   description = "URL of the deployed application"
-  value       = "http://${aws_instance.sitetour_server.public_ip}:8080"
+  value       = "http://${aws_eip.sitetour_eip.public_ip}"
+
 }
 
 output "ssh_command" {
   description = "Convenient SSH command"
-  value       = "ssh -i C:/Users/USER/.ssh/sitetour ubuntu@${aws_instance.sitetour_server.public_ip}"
+  value       = "ssh -i C:/Users/USER/.ssh/sitetour ubuntu@${aws_eip.sitetour_eip.public_ip}"
+
 }

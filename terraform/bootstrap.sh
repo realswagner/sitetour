@@ -15,7 +15,8 @@ apt-get install -y \
     unzip \
     ca-certificates \
     gnupg \
-    lsb-release
+    lsb-release \
+    certbot
 
 echo "===== installing Docker ====="
 
