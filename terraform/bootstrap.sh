@@ -18,6 +18,17 @@ apt-get install -y \
     lsb-release \
     certbot
 
+echo "===== installing AWS CLI ====="
+
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip"
+
+cd /tmp
+unzip -q awscliv2.zip
+
+/tmp/aws/install
+
+aws --version
+
 echo "===== installing Docker ====="
 
 install -m 0755 -d /etc/apt/keyrings

@@ -14,7 +14,10 @@ resource "aws_iam_role_policy" "ec2_ssm_parameter_read" {
           "ssm:GetParameters",
           "ssm:GetParametersByPath"
         ]
-        Resource = "arn:aws:ssm:${var.aws_region}:${data.aws_caller_identity.current.account_id}:parameter/sitetour/dev/*"
+        Resource = [
+          "arn:aws:ssm:${var.aws_region}:${data.aws_caller_identity.current.account_id}:parameter/sitetour/dev",
+          "arn:aws:ssm:${var.aws_region}:${data.aws_caller_identity.current.account_id}:parameter/sitetour/dev/*"
+        ]
       }
     ]
   })
