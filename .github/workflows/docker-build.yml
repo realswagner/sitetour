@@ -58,6 +58,7 @@ jobs:
           COMPOSE_CONTENT=$(base64 -w 0 deploy/docker-compose.yml)
           DEPLOY_SCRIPT_CONTENT=$(base64 -w 0 deploy/deploy.sh)
           HTTPS_SCRIPT_CONTENT=$(base64 -w 0 deploy/setup-https.sh)
+          ENV_SCRIPT_CONTENT=$(base64 -w 0 deploy/generate-env.sh)
           NGINX_CONFIG_CONTENT=$(base64 -w 0 deploy/nginx/default.conf)
           
           INSTANCE_ID=$(aws ec2 describe-instances \
@@ -78,7 +79,9 @@ jobs:
               \"echo $COMPOSE_CONTENT | base64 -d > /home/ubuntu/deploy/docker-compose.yml\",
               \"echo $DEPLOY_SCRIPT_CONTENT | base64 -d > /home/ubuntu/deploy/deploy.sh\",
               \"echo $HTTPS_SCRIPT_CONTENT | base64 -d > /home/ubuntu/deploy/setup-https.sh\",
-              \"printf '%s\n' 'POSTGRES_DB=${{ secrets.POSTGRES_DB }}' 'POSTGRES_USER=${{ secrets.POSTGRES_USER }}' 'POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}' 'SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }}' 'SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }}' 'SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }}' > /home/ubuntu/deploy/.env\",
+              \"echo $ENV_SCRIPT_CONTENT | base64 -d > /home/ubuntu/deploy/generate-env.sh\",
+              \"chmod +x /home/ubuntu/deploy/generate-env.sh\",
+              \"bash /home/ubuntu/deploy/generate-env.sh\",
               \"chmod +x /home/ubuntu/deploy/deploy.sh\",
               \"chmod +x /home/ubuntu/deploy/setup-https.sh\",
               \"chown -R ubuntu:ubuntu /home/ubuntu/deploy\",
