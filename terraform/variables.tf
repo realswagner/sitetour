@@ -62,3 +62,9 @@ variable "app_domain" {
 variable "letsencrypt_email" {
   type = string
 }
+//make db size configurable
+variable "postgres_volume_size" {
+  description = "Size of the PostgreSQL EBS volume in GB"
+  type        = number
+  default     = 20
+}

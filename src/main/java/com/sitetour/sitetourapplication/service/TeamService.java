@@ -72,15 +72,15 @@ public class TeamService {
         teamRepository.save(team);
     }
 
-
-    @PostConstruct
-    public void initTeams() {
-        if (teamRepository.count() == 0) {
-            teamRepository.save(new Team("Team Alpha"));
-            teamRepository.save(new Team("Team Beta"));
-            teamRepository.save(new Team("Team Gamma"));
-        }
-    }
+//    dummy data for testing purposes
+//    @PostConstruct
+//    public void initTeams() {
+//        if (teamRepository.count() == 0) {
+//            teamRepository.save(new Team("Team Alpha"));
+//            teamRepository.save(new Team("Team Beta"));
+//            teamRepository.save(new Team("Team Gamma"));
+//        }
+//    }
 
     public Team getTeamById(Long id) {
         return teamRepository.findById(id)
