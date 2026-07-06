@@ -62,4 +62,48 @@ mkdir -p /home/ubuntu/deploy
 
 chown -R ubuntu:ubuntu /home/ubuntu/deploy
 
+echo "===== configuring PostgreSQL EBS volume ====="
+
+POSTGRES_MOUNT="/mnt/sitetour-postgres"
+POSTGRES_DATA="$POSTGRES_MOUNT/data"
+
+# Wait for attached EBS volume to appear
+for i in {1..30}; do
+    if [ -b /dev/nvme1n1 ]; then
+        echo "PostgreSQL EBS volume found at /dev/nvme1n1"
+        break
+    fi
+
+    echo "Waiting for PostgreSQL EBS volume..."
+    sleep 5
+done
+
+if [ ! -b /dev/nvme1n1 ]; then
+    echo "PostgreSQL EBS volume not found. Skipping mount setup."
+else
+    # Format only if blank
+    if sudo file -s /dev/nvme1n1 | grep -q "data"; then
+        echo "Formatting PostgreSQL EBS volume..."
+        mkfs.ext4 /dev/nvme1n1
+    else
+        echo "PostgreSQL EBS volume already has a filesystem. Skipping format."
+    fi
+
+    mkdir -p "$POSTGRES_MOUNT"
+
+    UUID=$(blkid -s UUID -o value /dev/nvme1n1)
+
+    if ! grep -q "$UUID" /etc/fstab; then
+        echo "UUID=$UUID $POSTGRES_MOUNT ext4 defaults,nofail 0 2" >> /etc/fstab
+    fi
+
+    mount -a
+
+    mkdir -p "$POSTGRES_DATA"
+    chown -R 999:999 "$POSTGRES_DATA"
+    chmod 700 "$POSTGRES_DATA"
+
+    echo "PostgreSQL EBS volume mounted at $POSTGRES_MOUNT"
+fi
+
 echo "===== Bootstrap Complete ====="
