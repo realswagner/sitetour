@@ -14,6 +14,9 @@ for i in {1..30}; do
 
     echo "Recreating Nginx to refresh Docker DNS..."
     sudo docker compose up -d --force-recreate nginx
+    
+    echo "Cleaning up unused Docker images..."
+    sudo docker image prune -af
 
     sudo docker ps
     exit 0
