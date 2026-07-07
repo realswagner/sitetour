@@ -12,7 +12,8 @@ CI/CD, secure configuration management, and cloud deployment using Terraform, Do
 
 # Live Demo
 https://sitetour.realswagner.dev
-(insert dashboard pic)
+
+<img width="886" height="424" alt="image" src="https://github.com/user-attachments/assets/8bb8655b-783d-4a41-8ff7-c0bd486efab0" />
 
 # Technology Stack
 
@@ -81,8 +82,7 @@ DevOps
 ・AWSへの自動デプロイ • Automated AWS Deployment
 
 # Architecture
-
-(insert image)
+<img width="972" height="767" alt="image" src="https://github.com/user-attachments/assets/664bb137-be08-4396-808d-780bba398d83" />
 
 デプロイ手順 Quick Deployment
 
