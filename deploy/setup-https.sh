@@ -1,9 +1,17 @@
 #!/bin/bash
 set -e
 
-DOMAIN_NAME="realswagner.dev"
-SUBDOMAIN_NAME="sitetour.realswagner.dev"
-EMAIL="stephenwagner94@gmail.com"
+ENV_FILE="/home/ubuntu/deploy/.env"
+
+if [ -f "$ENV_FILE" ]; then
+  set -a
+  source "$ENV_FILE"
+  set +a
+fi
+
+DOMAIN_NAME="${DOMAIN_NAME:?DOMAIN_NAME is required}"
+SUBDOMAIN_NAME="${APP_DOMAIN:?APP_DOMAIN is required}"
+EMAIL="${LETSENCRYPT_EMAIL:?LETSENCRYPT_EMAIL is required}"
 
 CERT_PATH="/etc/letsencrypt/live/${DOMAIN_NAME}/fullchain.pem"
 

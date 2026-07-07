@@ -114,7 +114,7 @@ public class UserService {
 
             createAdmin(
                     "admin",
-                    "admin123");
+                    "ChangeMe123!");
 
             System.out.println(
                     "Default admin created");
