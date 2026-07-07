@@ -94,6 +94,7 @@ DevOps
 cd terraform
 terraform init
 terraform apply
+```
 
 4. Add required GitHub Actions secrets.
 5. Push to main.
