@@ -84,14 +84,20 @@ DevOps
 # Architecture
 <img width="972" height="767" alt="image" src="https://github.com/user-attachments/assets/664bb137-be08-4396-808d-780bba398d83" />
 
-デプロイ手順 Quick Deployment
+## Quick Deployment
 
-1. TerraformでAWS環境を構築 ・　Provision AWS infrastructure using Terraform
+1. Configure AWS credentials locally.
+2. Set required values in `terraform/terraform.tfvars`.
+3. Run Terraform:
 
-2. AWS Parameter Storeへ設定値を登録　・　Configure AWS Parameter Store.
+```bash
+cd terraform
+terraform init
+terraform apply
 
-3. GitHub Secretsを設定・ Configure GitHub Secrets.
+4. Add required GitHub Actions secrets.
+5. Push to main.
+6. GitHub Actions builds the Docker image and deploys to EC2 through AWS Systems Manager.
 
-4. mainブランチへPush　・　Push to the main branch.
 
 5. GitHub Actionsが自動デプロイを実行　・GitHub Actions automatically deploys the latest version.
