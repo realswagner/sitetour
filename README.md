@@ -102,9 +102,9 @@ DevOps
 
 ## Quick Deployment
 
-1. Configure AWS credentials locally.
-2. Set required values in `terraform/terraform.tfvars`.
-3. Run Terraform:
+1. Configure AWS credentials locally. ローカル環境でAWS認証情報を設定します。
+2. Set required values in `terraform/terraform.tfvars`.  に必要な設定値を入力します。
+3. Run Terraform: Terraformを実行します。
 
 ```bash
 cd terraform
@@ -112,12 +112,10 @@ terraform init
 terraform apply
 ```
 
-4. Add required GitHub Actions secrets.
-5. Push to main.
+4. Add required GitHub Actions secrets. GitHub Actionsで使用する必要なシークレットをGitHubに設定します。
+5. Push to main. `main` ブランチへプッシュします。
 6. GitHub Actions builds the Docker image and deploys to EC2 through AWS Systems Manager.
-
-
-5. GitHub Actionsが自動デプロイを実行　・GitHub Actions automatically deploys the latest version.
+   GitHub ActionsがDockerイメージを自動的にビルドし、AWS Systems Manager経由でEC2へデプロイを実行します。
 
 notes:
 本プロジェクトの一環として、追加のプロジェクト資料（システム設計、アーキテクチャに関する決定事項、
