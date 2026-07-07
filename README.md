@@ -113,3 +113,10 @@ terraform apply
 
 
 5. GitHub Actionsが自動デプロイを実行　・GitHub Actions automatically deploys the latest version.
+
+notes:
+本プロジェクトの一環として、追加のプロジェクト資料（システム設計、アーキテクチャに関する決定事項、
+デプロイメントガイド、テスト結果、機能仕様書）が作成されており、これらは別途入手可能です。
+
+Additional project documentation (system design, architecture decisions, deployment guide, 
+testing results, and feature specification) was prepared as part of this project and is available separately.
