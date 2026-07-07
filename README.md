@@ -1,4 +1,15 @@
 # SiteTour Interview Management System
+Project Status
+
+✅ Completed
+
+✅ Live Demo Available
+
+✅ Automated CI/CD
+
+✅ Infrastructure as Code
+
+✅ Persistent PostgreSQL Database
 
 # Overview
 
