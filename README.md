@@ -23,6 +23,11 @@ CI/CD, secure configuration management, and cloud deployment using Terraform, Do
 
 # Live Demo
 https://sitetour.realswagner.dev
+Note: This application is deployed on a personal AWS account for demonstration purposes. 
+The live demo may occasionally be unavailable due to maintenance, cost optimization, or infrastructure updates.
+
+注：本アプリケーションは、デモンストレーションを目的として個人のAWSアカウント上にデプロイされています。
+メンテナンス、コスト最適化、またはインフラストラクチャの更新などの理由により、ライブデモが一時的に利用できない場合があります。
 
 <img width="886" height="424" alt="image" src="https://github.com/user-attachments/assets/8bb8655b-783d-4a41-8ff7-c0bd486efab0" />
 
