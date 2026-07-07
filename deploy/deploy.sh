@@ -9,7 +9,7 @@ sudo docker compose up -d
 echo "Waiting for application health check..."
 
 for i in {1..30}; do
-  if sudo docker exec sitetour-app wget -qO- http://localhost:8080/login > /dev/null; then
+  if sudo docker exec sitetour-app wget -qO- http://localhost:8080/health | grep -q '"status":"UP"'; then
     echo "Health check passed."
     #force recreate nginx to avoid consistency issues
     echo "Recreating Nginx to refresh Docker DNS..."

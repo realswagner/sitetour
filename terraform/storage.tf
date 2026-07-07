@@ -18,4 +18,6 @@ resource "aws_volume_attachment" "postgres_data" {
   device_name = "/dev/sdf"
   volume_id   = aws_ebs_volume.postgres_data.id
   instance_id = aws_instance.sitetour_server.id
+  //detach ebs volume from old instance in case aws still thinks its attached
+  force_detach = true
 }

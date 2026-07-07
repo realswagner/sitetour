@@ -31,7 +31,8 @@ public class SecurityConfig {
                                 "/login",
                                 "/css/**",
                                 "/js/**",
-                                "/images/**"
+                                "/images/**",
+                                "/health"
                         ).permitAll()
 
                         // BOTH ADMIN + TEAM
@@ -39,7 +40,6 @@ public class SecurityConfig {
                         .requestMatchers("/dashboard").authenticated()
 
                         // PUBLIC
-                        .requestMatchers("/login").permitAll()
 
                         .anyRequest().authenticated()
                 )
