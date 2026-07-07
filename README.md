@@ -1,17 +1,6 @@
-# SiteTour Interview Management System
-Project Status
-
-✅ Completed
-
-✅ Live Demo Available
-
-✅ Automated CI/CD
-
-✅ Infrastructure as Code
-
-✅ Persistent PostgreSQL Database
-
 # Overview
+
+# SiteTour Interview Management System
 
 Java・Spring Boot・AWSを用いて開発した面接管理システムです。
 Spring BootによるWebアプリケーション開発だけでなく、
