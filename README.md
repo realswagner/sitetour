@@ -87,11 +87,18 @@ DevOps
 ・AWSへの自動デプロイ • Automated AWS Deployment
 
 # Architecture
+Spring MVC
 <img width="972" height="767" alt="image" src="https://github.com/user-attachments/assets/664bb137-be08-4396-808d-780bba398d83" />
+
+RunTime Architecture
 
 <img width="581" height="665" alt="image" src="https://github.com/user-attachments/assets/61357dfd-accc-4f38-91af-0f5683e1dd0c" />
 
+CI/CD
+
 <img width="562" height="627" alt="image" src="https://github.com/user-attachments/assets/bbc97435-f8d1-41ea-a3a8-2db7033b8e5e" />
+
+Terraform
 
 <img width="497" height="657" alt="image" src="https://github.com/user-attachments/assets/3315aa85-2d84-4629-a1c6-dcd1c970f791" />
 
